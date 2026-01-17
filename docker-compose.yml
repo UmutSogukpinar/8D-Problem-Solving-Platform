@@ -1,0 +1,37 @@
+service:
+
+# ============================================
+# Backend Service
+# ============================================
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: backend:8D-Problem-Solving-Platform
+    env_file:
+      - ./backend/.env
+    environment:
+      - MODE=dev
+    volumes:
+      - ./backend:/var/www/html
+    ports:
+      - "9000:9000"
+    depends_on:
+      - db
+    command: ["dev"]
+
+# ============================================
+# Database Service
+# ============================================
+  db:
+    image: mysql:8.0
+    container_name: db
+    environment:
+      - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${DB_NAME}
+      - MYSQL_USER=${DB_USER}
+      - MYSQL_PASSWORD=${DB_PASSWORD}
+    volumes:
+      - db_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
