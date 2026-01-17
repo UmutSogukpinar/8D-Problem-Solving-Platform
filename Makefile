@@ -16,7 +16,7 @@ info:
 
 build:
 	@echo "${GREEN}Building the project...${RESET}"
-	@docker compose build || (echo "${RED}Build failed!${RESET}" && exit 1)
+	@docker compose build || (echo "${RED}Build failed! ${RESET}" && exit 1)
 
 run: build
 	@echo "${BLUE}Starting containers...${RESET}"

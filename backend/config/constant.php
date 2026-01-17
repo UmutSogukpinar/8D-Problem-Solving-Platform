@@ -27,4 +27,5 @@ define('DB_CHARSET', 'utf8mb4');
 
 define('LOG_DIR', ROOT_DIR . '/logs');
 define('APP_LOG', LOG_DIR . '/app.log');
+// TODO: make the log level dynamic based on environment and user preference by docker cmd
 define('LOG_LEVEL', INFO); // INFO | WARNING | ERROR
