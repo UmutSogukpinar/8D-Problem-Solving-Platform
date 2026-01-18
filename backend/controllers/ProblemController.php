@@ -21,23 +21,9 @@ final class ProblemController extends AbstractController
      *
      * @return void
      */
-    public function get(int $id): void
+    public function getProblem(int $id): void
     {
-        $problem = $this->service->getById($id);
-
-        if ($problem === null)
-        {
-            $this->toJson(
-                ['error' => 'Resource not found'],
-                HTTP_NOT_FOUND
-            );
-            return;
-        }
-
-        $this->toJson(
-            $problem,
-            HTTP_OK
-        );
+        $this->get($id, [$this->service, 'getById']);
     }
 
     /**
@@ -58,25 +44,59 @@ final class ProblemController extends AbstractController
      */
     public function store(): void
     {
-        $this->storeAction(
-            [$this, 'createProblem'],
-            ['title', 'description'],
-            ['title', 'description']
-        );
-    }
+        $data = $this->readJsonBody();
 
-    /**
-     * Creates a new problem using the service layer.
-     *
-     * @param array $data Associative array with keys 'title' and 'description'.
-     *
-     * @return int ID of the newly created problem.
-     */
-    private function createProblem(array $data): int
-    {
-        return ($this->service->create(
-            $data['title'],
-            $data['description']
-        ));
+        if ($data === null)
+        {
+            $this->toJson(['error' => 'Invalid or missing JSON body'], HTTP_BAD_REQUEST);
+            return;
+        }
+
+        $errors = [];
+
+        if (empty($data['title']) || !is_string($data['title']))
+        {
+            $errors['title'] = 'Title is required and must be a string';
+        }
+
+        if (empty($data['description']) || !is_string($data['description'])) 
+        {
+            $errors['description'] = 'Description is required and must be a string';
+        }
+
+        $allowed = ['title', 'description'];
+        $extras = array_diff(array_keys($data), $allowed);
+        if (!empty($extras)) {
+             $errors['general'] = 'Unexpected fields: ' . implode(', ', $extras);
+        }
+
+        if (!empty($errors)) 
+        {
+            $this->toJson(['errors' => $errors], HTTP_UNPROCESSABLE_ENTITY);
+            return;
+        }
+
+            try
+            {
+                $newId = $this->service->create(
+                    $data['title'], 
+                    $data['description']
+                );
+
+                $this->toJson(
+                    [
+                        'id' => $newId,
+                        'message' => 'Problem created successfully'
+                    ], 
+                    HTTP_CREATED
+                );
+        } 
+        catch (Throwable) 
+        {
+            $this->toJson(
+                ['error' => 'Internal Server Error'], 
+                HTTP_INTERNAL_SERVER_ERROR
+            );
+        }
     }
 }
