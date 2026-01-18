@@ -37,4 +37,17 @@ final class ProblemService
             throw $e;
         }
     }
+
+    /**
+     * Retrieves a problem by its identifier.
+     *
+     * @param int $id
+     *
+     * @return array|null The problem data, or null if not found.
+     */
+    public function getById(int $id): ?array
+    {
+        return ($this->repo->findById($id));
+    }
+
 }

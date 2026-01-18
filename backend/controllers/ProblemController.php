@@ -7,6 +7,40 @@ final class ProblemController
     public function __construct(private ProblemService $service) {}
 
     /**
+     * Returns a problem resource by its ID.
+     *
+     * Request:
+     *  - Method: GET
+     *  - Path: /problems/{id}
+     *
+     * Responses:
+     *  - 200 OK                  on success
+     *  - 404 Not Found           if the resource does not exist
+     *
+     * @param int $id The unique identifier of the problem resource.
+     *
+     * @return void
+     */
+    public function get(int $id): void
+    {
+        $problem = $this->service->getById($id);
+
+        if ($problem === null)
+        {
+            $this->toJson(
+                ['error' => 'Resource not found'],
+                HTTP_NOT_FOUND
+            );
+            return;
+        }
+
+        $this->toJson(
+            $problem,
+            HTTP_OK
+        );
+    }
+
+    /**
      * Creates a new problem resource.
      *
      * Request:
@@ -17,7 +51,7 @@ final class ProblemController
      *  - 201 Created            on success
      *  - 400 Bad Request        if the request body is not valid JSON
      *  - 422 Unprocessable      if required fields are missing/empty 
-     *                           or unexpected fields are present
+     *                              or unexpected fields are present
      *  - 500 Internal Server    on unexpected errors
      *
      * @return void
@@ -66,10 +100,16 @@ final class ProblemController
         {
             if (function_exists('logMessage'))
             {
-                logMessage(ERROR, 'POST /problems failed: ' . $e->getMessage());
+                logMessage(
+                    ERROR, 
+                    'POST /problems failed: ' . $e->getMessage()
+                );
             }
 
-            $this->toJson(['error' => 'Internal server error'], 500);
+            $this->toJson(
+                ['error' => 'Internal server error'], 
+                HTTP_INTERNAL_SERVER_ERROR
+            );
             return ;
         }
     }
