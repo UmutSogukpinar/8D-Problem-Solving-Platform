@@ -11,7 +11,6 @@ final class ProblemController extends AbstractController
      *
      * Request:
      *  - Method: GET
-     *  - Path: /problems/{id}
      *
      * Responses:
      *  - 200 OK                  on success
@@ -58,22 +57,22 @@ final class ProblemController extends AbstractController
         {
             $errors['title'] = 'Title is required and must be a string';
         }
-
         if (empty($data['description']) || !is_string($data['description'])) 
         {
             $errors['description'] = 'Description is required and must be a string';
         }
-
+    
         $allowed = ['title', 'description'];
         $extras = array_diff(array_keys($data), $allowed);
-        if (!empty($extras)) {
-             $errors['general'] = 'Unexpected fields: ' . implode(', ', $extras);
+        if (!empty($extras))
+        {
+            $errors['general'] = 'Unexpected fields: ' . implode(', ', $extras);
         }
 
         if (!empty($errors)) 
         {
             $this->toJson(['errors' => $errors], HTTP_UNPROCESSABLE_ENTITY);
-            return;
+            return ;
         }
 
             try
@@ -87,7 +86,7 @@ final class ProblemController extends AbstractController
                     [
                         'id' => $newId,
                         'message' => 'Problem created successfully'
-                    ], 
+                    ],
                     HTTP_CREATED
                 );
         } 
