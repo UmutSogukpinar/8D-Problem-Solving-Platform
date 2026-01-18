@@ -6,7 +6,6 @@ class RootCausesTreeController extends AbstractController
 {
     public function __construct(private RootCausesTreeService $service) {}
 
-
     /**
      * Returns a root cause tree node by its ID.
      *
@@ -24,6 +23,14 @@ class RootCausesTreeController extends AbstractController
     public function getRootCause(int $id): void
     {
         $this->get($id, [$this->service, 'getById']);
+    }
+
+    public function getTreeByProblemId(int $problemId): void
+    {
+        $this->toJson(
+            $this->service->getTreeByProblemId($problemId),
+            HTTP_OK
+        );
     }
 
     /**
@@ -48,6 +55,8 @@ class RootCausesTreeController extends AbstractController
      */
     public function store(): void
     {
+
+        // ======== Read Json body ========
         $data = $this->readJsonBody();
 
         if ($data === null) 
@@ -56,6 +65,7 @@ class RootCausesTreeController extends AbstractController
             return;
         }
 
+        // ======== Validate data from JSON ========
         $errors = [];
 
         if (!isset($data['problem_id']) || !is_int($data['problem_id'])) 
@@ -77,6 +87,7 @@ class RootCausesTreeController extends AbstractController
             return;
         }
 
+        // ======== Create the root cause node ========
         try
         {
             $parentId = $data['parent_id'] ?? null;
@@ -101,4 +112,5 @@ class RootCausesTreeController extends AbstractController
             $this->toJson(['error' => 'Internal Server Error'], 500);
         }
     }
+
 }

@@ -43,6 +43,7 @@ final class ProblemController extends AbstractController
      */
     public function store(): void
     {
+        // ======== Read JSON body ========
         $data = $this->readJsonBody();
 
         if ($data === null)
@@ -51,6 +52,7 @@ final class ProblemController extends AbstractController
             return;
         }
 
+        // ======== Validate Data from JSON ========
         $errors = [];
 
         if (empty($data['title']) || !is_string($data['title']))
@@ -61,7 +63,7 @@ final class ProblemController extends AbstractController
         {
             $errors['description'] = 'Description is required and must be a string';
         }
-    
+
         $allowed = ['title', 'description'];
         $extras = array_diff(array_keys($data), $allowed);
         if (!empty($extras))
@@ -75,20 +77,21 @@ final class ProblemController extends AbstractController
             return ;
         }
 
-            try
-            {
-                $newId = $this->service->create(
-                    $data['title'], 
-                    $data['description']
-                );
+        // ======== Create Problem ========
+        try
+        {
+            $newId = $this->service->create(
+                $data['title'], 
+                $data['description']
+            );
 
-                $this->toJson(
-                    [
-                        'id' => $newId,
-                        'message' => 'Problem created successfully'
-                    ],
-                    HTTP_CREATED
-                );
+            $this->toJson(
+                [
+                    'id' => $newId,
+                    'message' => 'Problem created successfully'
+                ],
+                HTTP_CREATED
+            );
         } 
         catch (Throwable) 
         {
