@@ -5,8 +5,7 @@ declare(strict_types=1);
 final class ProblemService
 {
     public function __construct(
-        private ProblemRepository $repo,
-        private PDO $pdo
+        private ProblemRepository $repo
     ) {}
 
     /**
@@ -22,20 +21,7 @@ final class ProblemService
      */
     public function create(string $title, string $desc): int
     {
-        // Transaction begins
-        $this->pdo->beginTransaction();
-
-        try
-        {
-            $id = $this->repo->create($title, $desc);
-            $this->pdo->commit();
-            return ($id);
-        }
-        catch (Throwable $e)
-        {
-            $this->pdo->rollBack();
-            throw $e;
-        }
+        return ($this->repo->create($title, $desc));
     }
 
     /**
@@ -49,5 +35,4 @@ final class ProblemService
     {
         return ($this->repo->findById($id));
     }
-
 }

@@ -1,30 +1,45 @@
 <?php
+
 declare(strict_types=1);
 
-require_once dirname(__DIR__) . '/config/constants.php';
+define('ROOT_DIR', dirname(__DIR__));
+
+require_once ROOT_DIR . '/config/constants.php';
 require_once ROOT_DIR . '/database/connection.php';
 require_once ROOT_DIR . '/logger.php';
 
-// Get PDO connection
 $pdo = getPdo();
 
-// Get all migration files and sort them to ensure correct order
 $migrationFiles = glob(ROOT_DIR . '/migrations/*.php');
 sort($migrationFiles);
 
-foreach ($migrationFiles as $file) 
+$pdo->beginTransaction();
+
+try
 {
-    try 
+    foreach ($migrationFiles as $file)
     {
+        $sql = null;
+
         require $file;
+
+        if (!is_string($sql) || trim($sql) === '')
+        {
+            throw new RuntimeException(
+                'Migration did not define $sql as a non-empty string'
+            );
+        }
+
         $pdo->exec($sql);
         logMessage(INFO, basename($file) . ' executed');
-    } 
-    catch (Throwable $e) 
-    {
-        logMessage(ERROR, basename($file) . ' failed: ' . $e->getMessage());
-        exit(1);
     }
-}
 
-logMessage(INFO, 'All migrations completed');
+    $pdo->commit();
+    logMessage(INFO, 'All migrations completed');
+}
+catch (Throwable $e)
+{
+    $pdo->rollBack();
+    logMessage(ERROR, 'Migration failed: ' . $e->getMessage());
+    exit(1);
+}

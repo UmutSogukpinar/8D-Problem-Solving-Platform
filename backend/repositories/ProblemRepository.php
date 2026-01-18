@@ -32,7 +32,6 @@ final class ProblemRepository
         return ((int) $this->pdo->lastInsertId());
     }
 
-
     /**
      * Retrieves a problem by its unique identifier.
      *
@@ -54,39 +53,5 @@ final class ProblemRepository
         $stmt->execute(['id' => $id]);
 
         return ($stmt->fetch() ?: null);
-    }
-
-    /**
-     * Retrieves problems by their parent identifier.
-     *
-     * Executes a SELECT query and returns the matching problems
-     * as an associative array. If the given parent ID is null,
-     * only root-level problems are returned.
-     * If no records are found, null is returned.
-     *
-     * @param int|null $parentId Parent problem identifier or null for root problems
-     *
-     * @return array|null List of problem records or null if no matches are found
-     *
-     * @throws PDOException If the query execution fails
-     */
-    public function findByParent(?int $parentId): ?array
-    {
-        if ($parentId === null)
-        {
-            $stmt = $this->pdo->prepare(
-                "SELECT * FROM problems WHERE parentId IS NULL"
-            );
-            $stmt->execute();
-        }
-        else
-        {
-            $stmt = $this->pdo->prepare(
-                "SELECT * FROM problems WHERE parentId = :parentId"
-            );
-            $stmt->execute(['parentId' => $parentId]);
-        }
-
-        return ($stmt->fetchAll() ?: null);
     }
 }

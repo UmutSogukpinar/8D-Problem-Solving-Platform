@@ -13,7 +13,6 @@ info:
 	@echo "  ${GREEN}make test${RESET}   → Run tests inside container"
 	@echo "  ${GREEN}make info${RESET}   → Show information about commands"
 
-
 build:
 	@echo "${GREEN}Building the project...${RESET}"
 	@docker compose build || (echo "${RED}Build failed! ${RESET}" && exit 1)

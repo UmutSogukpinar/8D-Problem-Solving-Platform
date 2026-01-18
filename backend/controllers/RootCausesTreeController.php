@@ -20,11 +20,24 @@ class RootCausesTreeController extends AbstractController
      *
      * @return void
      */
-    public function getRootCause(int $id): void
+    public function getRootCauseNode(int $id): void
     {
         $this->get($id, [$this->service, 'getById']);
     }
 
+    /**
+     * Returns the root cause tree for a specific problem.
+     *
+     * Request:
+     *  - Method: GET
+     *
+     * Responses:
+     *  - 200 OK                  on success
+     *
+     * @param int $problemId The unique identifier of the problem.
+     *
+     * @return void
+     */
     public function getTreeByProblemId(int $problemId): void
     {
         $this->toJson(
