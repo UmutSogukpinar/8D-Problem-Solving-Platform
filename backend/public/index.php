@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use App\Core\Router;
+
 define('ROOT_DIR', dirname(__DIR__));
 
 $container = require ROOT_DIR . '/bootstrap.php';
