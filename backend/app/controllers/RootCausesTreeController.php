@@ -12,56 +12,57 @@ class RootCausesTreeController extends BaseController
     public function __construct(private RootCausesTreeService $service) {}
 
     /**
-     * Returns a root cause tree node by its ID.
+     * Retrieves a root cause tree node by its identifier.
      *
      * Request:
-     *  - Method: GET
-     *
+     * - Method: GET
+     * 
      * Responses:
-     *  - 200 OK                  on success
-     *  - 404 Not Found           if the resource does not exist
+     * - 200 OK                  on success
+     * - 404 Not Found            if the node does not exist
      *
      * @param int $id The unique identifier of the root cause node.
      *
-     * @return void
+     * @return mixed Prepared response payload.
      */
-    public function getRootCauseNode(int $id): void
+    public function getRootCauseNode(int $id): mixed
     {
-        $this->get($id, [$this->service, 'getById']);
+        return ($this->get($id, [$this->service, 'getById']));
     }
 
+    // TODO: Check later
     /**
-     * Returns the root cause tree for a specific problem.
+     * Retrieves the root cause tree for a given problem.
      *
      * Request:
-     *  - Method: GET
-     *
+     * - Method: GET
+     * 
      * Responses:
-     *  - 200 OK                  on success
+     * - 200 OK                  on success
+     * - 404 Not Found            if the problem does not exist
      *
      * @param int $problemId The unique identifier of the problem.
      *
-     * @return void
+     * @return mixed Prepared response payload.
      */
-    public function getTreeByProblemId(int $problemId): void
+    public function getTreeByProblemId(int $problemId): mixed
     {
-        $this->toJson(
+        return ($this->jsonResponse(
             $this->service->getTreeByProblemId($problemId),
             HTTP_OK
-        );
+        ));
     }
 
     /**
-     * Handles the creation of a new root cause tree node.
+     * Creates a new root cause tree node.
      *
      * Request:
-     *  - Method: POST
-     *  - Body (JSON):
-     *      {
-     *          "problem_id": int,
-     *          "description": string,
-     *          "parent_id": int | null
-     *      }
+     * - Method: POST
+     * 
+     * Expected JSON body:
+     *  - problem_id: int (required)
+     *  - description: string (required, non-empty)
+     *  - parent_id: int|null (optional)
      *
      * Responses:
      *  - 201 Created            on success
@@ -69,9 +70,9 @@ class RootCausesTreeController extends BaseController
      *  - 422 Unprocessable      if required fields are missing/invalid
      *  - 500 Internal Server    on unexpected errors
      *
-     * @return void
+     * @return mixed Prepared response payload.
      */
-    public function store(): void
+    public function store(): mixed
     {
 
         // ======== Read Json body ========
@@ -79,8 +80,10 @@ class RootCausesTreeController extends BaseController
 
         if ($data === null) 
         {
-            $this->toJson(['error' => 'Invalid or missing JSON body'], HTTP_BAD_REQUEST);
-            return;
+            return ($this->jsonResponse(
+                ['error' => 'Invalid or missing JSON body'],
+                HTTP_BAD_REQUEST))
+            ;
         }
 
         // ======== Validate data from JSON ========
@@ -101,8 +104,10 @@ class RootCausesTreeController extends BaseController
 
         if (!empty($errors))
         {
-            $this->toJson(['errors' => $errors], HTTP_UNPROCESSABLE_ENTITY);
-            return;
+            return ($this->jsonResponse(
+                ['errors' => $errors], 
+                HTTP_UNPROCESSABLE_ENTITY)
+            );
         }
 
         // ======== Create the root cause node ========
@@ -116,18 +121,21 @@ class RootCausesTreeController extends BaseController
                 $data['description']
             );
 
-            $this->toJson(
+            return ($this->jsonResponse(
                 [
                     'id' => $newId,
                     'message' => 'Root cause node created'
                 ], 
                 HTTP_CREATED
-            );
+            ));
 
         } 
         catch (Throwable)
         {
-            $this->toJson(['error' => 'Internal Server Error'], 500);
+            return ($this->jsonResponse(
+                ['error' => 'Internal Server Error'],
+                HTTP_INTERNAL_SERVER_ERROR)
+            );
         }
     }
 

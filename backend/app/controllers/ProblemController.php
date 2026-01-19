@@ -23,11 +23,11 @@ final class ProblemController extends BaseController
      *
      * @param int $id The unique identifier of the problem resource.
      *
-     * @return void
+     * @return mixed Prepared response payload.
      */
-    public function getProblem(int $id): void
+    public function getProblem(int $id): mixed
     {
-        $this->get($id, [$this->service, 'getById']);
+        return ($this->get($id, [$this->service, 'getById']));
     }
 
     /**
@@ -35,7 +35,10 @@ final class ProblemController extends BaseController
      *
      * Request:
      *  - Method: POST
-     *  - Body (JSON): { "title": string, "description": string }
+     * 
+     * Expected JSON body:
+     *  - title: string (required, non-empty)
+     *  - description: string (required, non-empty)
      *
      * Responses:
      *  - 201 Created            on success
@@ -44,17 +47,19 @@ final class ProblemController extends BaseController
      *                              or unexpected fields are present
      *  - 500 Internal Server    on unexpected errors
      *
-     * @return void
+     * @return mixed Prepared response payload.
      */
-    public function store(): void
+    public function store(): mixed
     {
         // ======== Read JSON body ========
         $data = $this->readJsonBody();
 
         if ($data === null)
         {
-            $this->toJson(['error' => 'Invalid or missing JSON body'], HTTP_BAD_REQUEST);
-            return;
+            return ($this->jsonResponse(
+                ['error' => 'Invalid or missing JSON body'],
+                HTTP_BAD_REQUEST
+            ));
         }
 
         // ======== Validate Data from JSON ========
@@ -78,8 +83,10 @@ final class ProblemController extends BaseController
 
         if (!empty($errors)) 
         {
-            $this->toJson(['errors' => $errors], HTTP_UNPROCESSABLE_ENTITY);
-            return ;
+            return ($this->jsonResponse(
+                ['errors' => $errors],
+                HTTP_UNPROCESSABLE_ENTITY
+            ));
         }
 
         // ======== Create Problem ========
@@ -90,20 +97,20 @@ final class ProblemController extends BaseController
                 $data['description']
             );
 
-            $this->toJson(
+            return ($this->jsonResponse(
                 [
                     'id' => $newId,
                     'message' => 'Problem created successfully'
                 ],
                 HTTP_CREATED
-            );
+            ));
         } 
         catch (Throwable) 
         {
-            $this->toJson(
+            return ($this->jsonResponse(
                 ['error' => 'Internal Server Error'], 
                 HTTP_INTERNAL_SERVER_ERROR
-            );
+            ));
         }
     }
 }

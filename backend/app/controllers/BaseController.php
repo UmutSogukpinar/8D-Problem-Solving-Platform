@@ -9,73 +9,55 @@ use JsonException;
 class BaseController
 {
     /**
-     * Handles a generic "get" action for retrieving a resource by ID.
+     * Handles a generic "get" action for retrieving a resource by its identifier.
      *
-     * Executes the provided retrieval callable and sends a standardized JSON response.
+     * Executes the given retrieval callable and prepares a standardized
+     * response payload along with the appropriate HTTP status code.
+     * The actual JSON encoding and output are expected to be handled
+     * by a higher-level response handler.
      *
-     * Responses:
-     *  - 200 OK          on success
-     *  - 404 Not Found   if the resource does not exist
+     * Response behavior:
+     *  - Returns the resource data with HTTP 200 if found
+     *  - Returns an error payload with HTTP 404 if the resource is not found
      *
-     * @param int      $id      The unique identifier of the resource.
-     * @param callable $getFn   Function responsible for retrieving the resource.
-     *                          Signature: function(int $id): ?array
-     *                          Must return the resource data as an associative array,
-     *                          or null if not found.
+     * @param int      $id    The unique identifier of the resource.
+     * @param callable $getFn Retrieval function.
+     *                        Signature: function(int $id): mixed|null
+     *                        Must return the resource data or null if not found.
      *
-     * @return void
+     * @return mixed Prepared response payload.
      */
-    protected function get(int $id, Callable $getFn): void
+    protected function get(int $id, Callable $getFn): mixed
     {
         $data = $getFn($id);
 
         if ($data === null)
         {
-            $this->toJson(
+            return ($this->jsonResponse(
                 ['error' => 'Resource not found'],
                 HTTP_NOT_FOUND
-            );
-            return ;
+            ));
         }
 
-        $this->toJson(
-            $data,
-            HTTP_OK
-        );
+        return ($this->jsonResponse($data, HTTP_OK));
     }
 
     /**
-     * Sends the given payload as a JSON HTTP response.
+     * Prepares a JSON response payload with the given HTTP status code.
      *
-     * Sets the HTTP status code and JSON content type header, then encodes and outputs
-     * the payload as JSON. If JSON encoding fails, a 500 response is sent.
+     * Sets the HTTP response status code and returns the given payload.
+     * The actual JSON encoding and output are expected to be handled
+     * by the caller or a higher-level response handler.
      *
-     * @param mixed $payload Data to be encoded and sent as JSON.
-     * @param int   $status  HTTP status code.
+     * @param mixed $payload Data to be returned as the response body.
+     * @param int   $status  HTTP status code to set for the response.
      *
-     * @return void
+     * @return mixed The response payload.
      */
-    protected function toJson(mixed $payload, int $status): void
+    protected function jsonResponse(mixed $payload, int $status = 200): mixed
     {
-        if (!headers_sent()) 
-        {
-            http_response_code($status);
-            header('Content-Type: application/json; charset=utf-8');
-        }
-
-        try 
-        {
-            echo json_encode($payload, JSON_THROW_ON_ERROR);
-        }
-        catch (JsonException) 
-        {
-            if (!headers_sent()) 
-            {
-                http_response_code(HTTP_INTERNAL_SERVER_ERROR);
-            }
-
-            echo '{"error":"JSON encoding failed"}';
-        }
+        http_response_code($status);
+        return ($payload);
     }
 
     /**
