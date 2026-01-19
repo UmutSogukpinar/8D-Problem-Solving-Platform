@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Controllers;
 
 use JsonException;
+use App\Exceptions\NotFoundException;
+
 
 class BaseController
 {
@@ -33,10 +35,7 @@ class BaseController
 
         if ($data === null)
         {
-            return ($this->jsonResponse(
-                ['error' => 'Resource not found'],
-                HTTP_NOT_FOUND
-            ));
+            throw new NotFoundException();
         }
 
         return ($this->jsonResponse($data, HTTP_OK));

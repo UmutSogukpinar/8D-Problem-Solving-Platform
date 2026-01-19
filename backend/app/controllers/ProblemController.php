@@ -4,12 +4,16 @@ declare(strict_types=1);
 
 namespace App\Controllers;
 
-use Throwable;
+use App\Core\Request;
 use App\Services\ProblemService;
+use App\Core\Validator;
 
 final class ProblemController extends BaseController
 {
-    public function __construct(private ProblemService $service) {}
+    public function __construct(
+        private Request $request,
+        private ProblemService $service
+    ) {}
 
     /**
      * Returns a problem resource by its ID.
@@ -52,65 +56,28 @@ final class ProblemController extends BaseController
     public function store(): mixed
     {
         // ======== Read JSON body ========
-        $data = $this->readJsonBody();
-
-        if ($data === null)
-        {
-            return ($this->jsonResponse(
-                ['error' => 'Invalid or missing JSON body'],
-                HTTP_BAD_REQUEST
-            ));
-        }
+        $data = $this->request->all();
 
         // ======== Validate Data from JSON ========
-        $errors = [];
-
-        if (empty($data['title']) || !is_string($data['title']))
-        {
-            $errors['title'] = 'Title is required and must be a string';
-        }
-        if (empty($data['description']) || !is_string($data['description'])) 
-        {
-            $errors['description'] = 'Description is required and must be a string';
-        }
-
-        $allowed = ['title', 'description'];
-        $extras = array_diff(array_keys($data), $allowed);
-        if (!empty($extras))
-        {
-            $errors['general'] = 'Unexpected fields: ' . implode(', ', $extras);
-        }
-
-        if (!empty($errors)) 
-        {
-            return ($this->jsonResponse(
-                ['errors' => $errors],
-                HTTP_UNPROCESSABLE_ENTITY
-            ));
-        }
+        Validator::validate($data, [
+            'title'       => 'required|string',
+            'description' => 'required|string'
+        ]);
 
         // ======== Create Problem ========
-        try
-        {
-            $newId = $this->service->create(
-                $data['title'], 
-                $data['description']
-            );
+        $newId = $this->service->create(
+            $data['title'], 
+            $data['description']
+        );
 
-            return ($this->jsonResponse(
-                [
-                    'id' => $newId,
-                    'message' => 'Problem created successfully'
-                ],
-                HTTP_CREATED
-            ));
-        } 
-        catch (Throwable) 
-        {
-            return ($this->jsonResponse(
-                ['error' => 'Internal Server Error'], 
-                HTTP_INTERNAL_SERVER_ERROR
-            ));
-        }
+        // ======== Return Response ========
+        return ($this->jsonResponse(
+            [
+                'id' => $newId,
+                'message' => 'Problem created successfully'
+            ],
+            HTTP_CREATED
+        ));
     }
+
 }

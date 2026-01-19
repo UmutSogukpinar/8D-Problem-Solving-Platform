@@ -4,12 +4,17 @@ declare(strict_types=1);
 
 namespace App\Controllers;
 
-use Throwable;
+use App\Core\Validator;
+use App\Core\Request;
 use App\Services\RootCausesTreeService;
+use App\Exceptions\BadRequestException;
 
 class RootCausesTreeController extends BaseController
 {
-    public function __construct(private RootCausesTreeService $service) {}
+    public function __construct(
+        private Request $request,
+        private RootCausesTreeService $service
+    ) {}
 
     /**
      * Retrieves a root cause tree node by its identifier.
@@ -74,69 +79,31 @@ class RootCausesTreeController extends BaseController
      */
     public function store(): mixed
     {
-
         // ======== Read Json body ========
-        $data = $this->readJsonBody();
-
-        if ($data === null) 
-        {
-            return ($this->jsonResponse(
-                ['error' => 'Invalid or missing JSON body'],
-                HTTP_BAD_REQUEST))
-            ;
-        }
+        $data = $this->request->all();
 
         // ======== Validate data from JSON ========
-        $errors = [];
-
-        if (!isset($data['problem_id']) || !is_int($data['problem_id'])) 
-        {
-            $errors['problem_id'] = 'Required field and must be an integer';
-        }
-        if (empty($data['description']) || !is_string($data['description']))
-        {
-            $errors['description'] = 'Required field and must be a non-empty string';
-        }
-        if (isset($data['parent_id']) && !is_int($data['parent_id']))
-        {
-            $errors['parent_id'] = 'Must be an integer or null';
-        }
-
-        if (!empty($errors))
-        {
-            return ($this->jsonResponse(
-                ['errors' => $errors], 
-                HTTP_UNPROCESSABLE_ENTITY)
-            );
-        }
+        Validator::validate($data, [
+            'problem_id'  => 'required|int',
+            'description' => 'required|string',
+            'parent_id'   => 'nullable|int'
+        ]);
 
         // ======== Create the root cause node ========
-        try
-        {
-            $parentId = $data['parent_id'] ?? null;
+        $newId = $this->service->create(
+            (int) $data['problem_id'],
+            $data['parent_id'],
+            $data['description']
+        );
 
-            $newId = $this->service->create(
-                $data['problem_id'],
-                $parentId,
-                $data['description']
-            );
-
-            return ($this->jsonResponse(
-                [
-                    'id' => $newId,
-                    'message' => 'Root cause node created'
-                ], 
-                HTTP_CREATED
-            ));
-
-        } 
-        catch (Throwable)
-        {
-            return ($this->jsonResponse(
-                ['error' => 'Internal Server Error'],
-                HTTP_INTERNAL_SERVER_ERROR)
-            );
-        }
+        // ======== Return Response ========
+        return ($this->jsonResponse(
+            [
+                'id' => $newId,
+                'message' => 'Root cause node created'
+            ],
+            HTTP_CREATED
+        ));
     }
 
 }
