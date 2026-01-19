@@ -63,7 +63,7 @@ final class Container
     {
         if (isset($this->instances[$id]))
         {
-            return $this->instances[$id];
+            return ($this->instances[$id]);
         }
 
         if (isset($this->bindings[$id]))
