@@ -5,8 +5,8 @@ declare(strict_types=1);
 define('ROOT_DIR', dirname(__DIR__));
 
 require_once ROOT_DIR . '/config/constants.php';
-require_once ROOT_DIR . '/database/connection.php';
-require_once ROOT_DIR . '/logger.php';
+require_once ROOT_DIR . '/database/migrate.php';
+require_once ROOT_DIR . '/utils/logger.php';
 
 $pdo = getPdo();
 

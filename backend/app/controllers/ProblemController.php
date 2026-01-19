@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-final class ProblemController extends AbstractController
+final class ProblemController extends BaseController
 {
     public function __construct(private ProblemService $service) {}
 

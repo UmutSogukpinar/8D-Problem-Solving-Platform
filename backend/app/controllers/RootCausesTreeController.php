@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-class RootCausesTreeController extends AbstractController
+class RootCausesTreeController extends BaseController
 {
     public function __construct(private RootCausesTreeService $service) {}
 

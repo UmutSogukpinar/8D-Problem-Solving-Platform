@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-class AbstractController
+class BaseController
 {
     /**
      * Handles a generic "get" action for retrieving a resource by ID.

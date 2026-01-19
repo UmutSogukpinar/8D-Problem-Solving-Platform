@@ -16,13 +16,20 @@ require_once ROOT_DIR . '/utils/logger.php';
 | Database
 |--------------------------------------------------------------------------
 */
-require_once ROOT_DIR . '/database/getPdo.php';
+require_once ROOT_DIR . '/database/migrate.php';
 
 /*
 |--------------------------------------------------------------------------
 | Application layers
 |--------------------------------------------------------------------------
 */
-require_once ROOT_DIR . '/repositories/ProblemRepository.php';
-require_once ROOT_DIR . '/services/ProblemService.php';
-require_once ROOT_DIR . '/controllers/ProblemController.php';
+require_once ROOT_DIR . '/app/repositories/ProblemRepository.php';
+require_once ROOT_DIR . '/app/services/ProblemService.php';
+require_once ROOT_DIR . '/app/controllers/ProblemController.php';
+
+require_once ROOT_DIR . '/app/repositories/RootCausesTreeRepository.php';
+require_once ROOT_DIR . '/app/services/RootCausesTreeService.php';
+require_once ROOT_DIR . '/app/controllers/RootCausesTreeController.php';
+
+require_once ROOT_DIR . '/app/controllers/BaseControoler.php';
+
