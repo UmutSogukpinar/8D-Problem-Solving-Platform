@@ -2,6 +2,11 @@
 
 declare(strict_types=1);
 
+namespace App\Controllers;
+
+use Throwable;
+use App\Services\RootCausesTreeService;
+
 class RootCausesTreeController extends BaseController
 {
     public function __construct(private RootCausesTreeService $service) {}

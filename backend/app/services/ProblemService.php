@@ -2,6 +2,10 @@
 
 declare(strict_types=1);
 
+namespace App\Services;
+
+use App\Repositories\ProblemRepository;
+
 final class ProblemService
 {
     public function __construct(

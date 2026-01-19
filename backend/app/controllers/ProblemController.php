@@ -2,6 +2,11 @@
 
 declare(strict_types=1);
 
+namespace App\Controllers;
+
+use Throwable;
+use App\Services\ProblemService;
+
 final class ProblemController extends BaseController
 {
     public function __construct(private ProblemService $service) {}

@@ -2,6 +2,10 @@
 
 declare(strict_types=1);
 
+namespace App\Controllers;
+
+use JsonException;
+
 class BaseController
 {
     /**
@@ -46,12 +50,12 @@ class BaseController
      * Sets the HTTP status code and JSON content type header, then encodes and outputs
      * the payload as JSON. If JSON encoding fails, a 500 response is sent.
      *
-     * @param array $payload Data to be sent as JSON.
+     * @param mixed $payload Data to be encoded and sent as JSON.
      * @param int   $status  HTTP status code.
      *
      * @return void
      */
-    protected function toJson(array $payload, int $status): void
+    protected function toJson(mixed $payload, int $status): void
     {
         if (!headers_sent()) 
         {

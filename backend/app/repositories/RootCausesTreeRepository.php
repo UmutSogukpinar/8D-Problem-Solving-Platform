@@ -1,5 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
+namespace App\Repositories;
+
+use PDO;
+
 final class RootCausesTreeRepository
 {
     public function __construct(private PDO $pdo) {}
