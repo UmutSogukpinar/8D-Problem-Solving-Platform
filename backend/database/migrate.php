@@ -2,9 +2,7 @@
 
 declare(strict_types=1);
 
-define('ROOT_DIR', dirname(__DIR__));
-
-require_once ROOT_DIR . '/config/constants.php';
+require_once dirname(__DIR__) . '/config/constants.php';
 require_once ROOT_DIR . '/config/database.php';
 require_once ROOT_DIR . '/utils/logger.php';
 

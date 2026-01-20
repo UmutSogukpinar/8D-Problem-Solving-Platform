@@ -2,9 +2,8 @@
 
 declare(strict_types=1);
 
-use PDO;
-
-return function (PDO $pdo): void {
+return function (PDO $pdo): void 
+{
     $crews = [
         'Alpha Crew',
         'Beta Crew',
@@ -12,13 +11,19 @@ return function (PDO $pdo): void {
 
     $stmt = $pdo->prepare("
         INSERT INTO crews (name)
-        SELECT :name
+        SELECT :val
         WHERE NOT EXISTS (
-            SELECT 1 FROM crews WHERE name = :name
+            SELECT 1 FROM crews WHERE name = :check
         )
     ");
 
-    foreach ($crews as $name) {
-        $stmt->execute(['name' => $name]);
+    foreach ($crews as $name)
+    {
+        $stmt->execute([
+            'val'   => $name,
+            'check' => $name
+        ]);
     }
+
+    logMessage(INFO, "Seed 1 executed successfuly!");
 };

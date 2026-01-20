@@ -20,7 +20,6 @@ else
 fi
 
 
-
 # ---------------------------------------------------------
 # Change file and group permissions
 # ---------------------------------------------------------
@@ -41,6 +40,19 @@ if [ -f "$MIGRATION_FILE" ]; then
 else
     echo "[WARNING]: Migration script not found at '$MIGRATION_FILE'. Skipping."
 fi
+
+# ---------------------------------------------------------
+# Execute database seeds
+# ---------------------------------------------------------
+SEED_FILE="database/seed.php"
+
+if [ -f "$SEED_FILE" ]; then
+    echo "[INFO]: Executing database seeds from $SEED_FILE..."
+    php "$SEED_FILE"
+else
+    echo "[WARNING]: Seed script not found at '$SEED_FILE'. Skipping."
+fi
+
 
 # ---------------------------------------------------------
 # Start PHP-FPM

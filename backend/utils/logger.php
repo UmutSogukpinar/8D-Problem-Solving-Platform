@@ -1,9 +1,9 @@
 <?php
 declare(strict_types=1);
 
-
-
 require_once dirname(__DIR__) . '/config/constants.php';
+
+date_default_timezone_set('Europe/Istanbul');
 
 /**
  * Writes a log message to the application log file.

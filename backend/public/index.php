@@ -21,16 +21,21 @@ $container = new Container();
 
 // --- Binding Dependencies ---
 
-$container->bind(Request::class, function ()
-{
-    return (new Request());
-});
+$container->bind(
+    Request::class,
+    function () {
+        return (new Request());
+    }
+);
 
 // Database Connection (PDO)
-$container->bind(PDO::class, function () {
-    require_once __DIR__ . '/../config/database.php';
-    return (getPdo());
-});
+$container->bind(
+    PDO::class,
+    function () {
+        require_once __DIR__ . '/../config/database.php';
+        return (getPdo());
+    }
+);
 
 // Start the Router
 $router = new Router($container);

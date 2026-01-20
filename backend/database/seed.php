@@ -2,7 +2,11 @@
 
 declare(strict_types=1);
 
-require_once __DIR__ . '/../vendor/autoload.php';
+require_once dirname(__DIR__) . '/vendor/autoload.php';
+require_once dirname(__DIR__) . '/config/database.php';
+require_once dirname(__DIR__) . '/config/constants.php';
+require_once dirname(__DIR__) . '/utils/logger.php';
+
 
 $pdo = getPdo();
 
@@ -15,8 +19,7 @@ try
 {
     foreach ($seedFiles as $file)
     {
-        $seed = null;
-        require $file;
+        $seed = require $file;
 
         if (!is_callable($seed))
         {
@@ -25,9 +28,8 @@ try
 
         $seed($pdo);
     }
-
     $pdo->commit();
-    logMessage(DEBUG, "Seeding completed");
+    logMessage(INFO, "Seeding completed");
 }
 catch (Throwable $e)
 {
