@@ -22,7 +22,6 @@ try
     foreach ($migrationFiles as $file)
     {
         $sql = null;
-
         require $file;
 
         if (!is_string($sql) || trim($sql) === '')
