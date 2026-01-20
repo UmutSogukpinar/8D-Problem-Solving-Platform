@@ -28,7 +28,7 @@ export default function ProblemsGrid()
 				setLoading(true);
 				setError(null);
 
-				// TODO: Put your real endpoint here
+				// TODO: Put real endpoint here
 				const res = await fetch("http://localhost/problems", {
 					headers: { "Accept": "application/json" }
 				});
