@@ -9,6 +9,7 @@ define('UPLOAD_DIR', ROOT_DIR . '/public/uploads');
 
 // ====== Log message prefixes ======
 
+define('DEBUG', '[DEBUG]: ');
 define('INFO', '[INFO]: ');
 define('ERROR', '[ERROR]: ');
 define('SUCCESS', '[SUCCESS]: ');
@@ -16,11 +17,14 @@ define('WARNING', '[WARNING]: ');
 
 // ====== Database configuration ======
 
-define('DB_HOST', 'localhost');
-define('DB_NAME', 'test_db');
-define('DB_USER', 'root');
-define('DB_PASS', '');
-define('DB_CHARSET', 'utf8mb4');
+define('DB_HOST', $_ENV['DB_HOST'] ?? 'db');
+define('DB_PORT', $_ENV['DB_PORT'] ?? '3306');
+
+define('DB_NAME', $_ENV['DB_DATABASE'] ?? '8d_db');
+
+define('DB_USER', $_ENV['DB_USERNAME'] ?? 'tony');
+define('DB_PASS', $_ENV['DB_PASSWORD'] ?? 'xxxxxx');
+define('DB_CHARSET', $_ENV['DB_CHARSET'] ?? 'utf8mb4');
 
 
 // ====== Logging configuration ======
@@ -28,7 +32,7 @@ define('DB_CHARSET', 'utf8mb4');
 define('LOG_DIR', ROOT_DIR . '/logs');
 define('APP_LOG', LOG_DIR . '/app.log');
 // TODO: make the log level dynamic based on environment and user preference by docker cmd
-define('LOG_LEVEL', INFO); // INFO | WARNING | ERROR
+define('LOG_LEVEL', DEBUG); // DEBUG | INFO | WARNING | ERROR
 
 
 // ====== HTTP status codes ======

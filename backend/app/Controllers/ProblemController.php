@@ -13,7 +13,29 @@ final class ProblemController extends BaseController
     public function __construct(
         private Request $request,
         private ProblemService $service
-    ) {}
+    ) 
+    {
+        logMessage(DEBUG, "Problem Controller initalized!");
+    }
+
+    /**
+     * Health check endpoint for the ProblemController.
+     *
+     * Request:
+     *  - Method: GET
+     *
+     * Responses:
+     *  - 200 OK on success
+     *
+     * @return mixed Prepared response payload.
+     */
+    public function health(): mixed
+    {
+        return ($this->jsonResponse(
+            ['status' => 'ProblemController is healthy'],
+            HTTP_OK
+        ));
+    }
 
     /**
      * Returns a problem resource by its ID.

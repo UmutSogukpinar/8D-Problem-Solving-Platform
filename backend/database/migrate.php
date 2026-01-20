@@ -5,8 +5,10 @@ declare(strict_types=1);
 define('ROOT_DIR', dirname(__DIR__));
 
 require_once ROOT_DIR . '/config/constants.php';
-require_once ROOT_DIR . '/database/migrate.php';
+require_once ROOT_DIR . '/config/database.php';
 require_once ROOT_DIR . '/utils/logger.php';
+
+initLogger();
 
 $pdo = getPdo();
 
@@ -34,12 +36,14 @@ try
         logMessage(INFO, basename($file) . ' executed');
     }
 
-    $pdo->commit();
     logMessage(INFO, 'All migrations completed');
 }
 catch (Throwable $e)
 {
-    $pdo->rollBack();
+    if ($pdo->inTransaction()) 
+    {
+        $pdo->rollBack();
+    }
     logMessage(ERROR, 'Migration failed: ' . $e->getMessage());
     exit(1);
 }

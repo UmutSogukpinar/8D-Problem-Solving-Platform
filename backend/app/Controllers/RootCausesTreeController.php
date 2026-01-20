@@ -7,7 +7,6 @@ namespace App\Controllers;
 use App\Core\Validator;
 use App\Core\Request;
 use App\Services\RootCausesTreeService;
-use App\Exceptions\BadRequestException;
 
 class RootCausesTreeController extends BaseController
 {

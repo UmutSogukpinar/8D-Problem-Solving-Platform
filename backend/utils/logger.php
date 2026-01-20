@@ -1,7 +1,9 @@
 <?php
 declare(strict_types=1);
 
-require_once ROOT_DIR . '/config/constants.php';
+
+
+require_once dirname(__DIR__) . '/config/constants.php';
 
 /**
  * Writes a log message to the application log file.
@@ -38,6 +40,17 @@ function logMessage(string $level, string $message): void
     );
 }
 
+function initLogger(): void
+{
+    if (!is_dir(LOG_DIR))
+    {
+        mkdir(LOG_DIR, 0755, true);
+    }
+
+    // truncate log file
+    file_put_contents(APP_LOG, '');
+}
+
 /**
  * Determines whether a log level should be written.
  *
@@ -48,9 +61,10 @@ function logMessage(string $level, string $message): void
 function shouldLog(string $level): bool
 {
     $levels = [
-        INFO => 1,
-        WARNING => 2,
-        ERROR => 3
+        DEBUG => 1,
+        INFO => 2,
+        WARNING => 3,
+        ERROR => 4
     ];
 
     return ($levels[$level] >= $levels[LOG_LEVEL]);

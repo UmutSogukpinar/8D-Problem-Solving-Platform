@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 use App\Core\Container;
-use App\Core\ErrorHandler;
+use App\Core\GlobalErrorHandler;
 
 /*
 |--------------------------------------------------------------------------
@@ -17,14 +17,14 @@ require_once ROOT_DIR . '/vendor/autoload.php';
 | Global Error Handler
 |--------------------------------------------------------------------------
 */
-set_exception_handler([ErrorHandler::class, 'handle']);
+set_exception_handler([GlobalErrorHandler::class, 'handle']);
 
 /*
 |--------------------------------------------------------------------------
 | Configurations and Utilities
 |--------------------------------------------------------------------------
 */
-require_once ROOT_DIR . '/config/constant.php';
+require_once ROOT_DIR . '/config/constants.php';
 require_once ROOT_DIR . '/config/database.php';
 require_once ROOT_DIR . '/utils/logger.php';
 

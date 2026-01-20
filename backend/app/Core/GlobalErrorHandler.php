@@ -6,7 +6,7 @@ namespace App\Core;
 
 use Throwable;
 
-class ErrorHandler
+class GlobalErrorHandler
 {
 
     /**

@@ -123,7 +123,7 @@ final class Container
                 if ($param->isDefaultValueAvailable())
                 {
                     $args[] = $param->getDefaultValue();
-                    continue;
+                    continue ;
                 }
 
                 throw new RuntimeException(

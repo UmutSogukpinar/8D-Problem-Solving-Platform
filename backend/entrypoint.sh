@@ -1,5 +1,4 @@
 #!/bin/bash
-set -e 
 
 # Set mode: 'prod' or 'dev' (default: 'prod')
 MODE="${1:-prod}"
@@ -20,14 +19,27 @@ else
     exit 1
 fi
 
+
+
+# ---------------------------------------------------------
+# Change file and group permissions
+# ---------------------------------------------------------
+echo "[INFO]: Fixing permissions for /var/www/html..."
+
+chgrp -R www-data /var/www/html/logs
+chmod -R 2775 /var/www/html/logs
+
+
 # ---------------------------------------------------------
 # Execute database migrations
 # ---------------------------------------------------------
-if [ -f "migrate.php" ]; then
-    echo "[INFO]: Executing database migrations..."
-    php migrate.php
+MIGRATION_FILE="database/migrate.php"
+
+if [ -f "$MIGRATION_FILE" ]; then
+    echo "[INFO]: Executing database migrations from $MIGRATION_FILE..."
+    php "$MIGRATION_FILE"
 else
-    echo "[WARNING]: Migration script 'migrate.php' not found. Skipping migrations."
+    echo "[WARNING]: Migration script not found at '$MIGRATION_FILE'. Skipping."
 fi
 
 # ---------------------------------------------------------

@@ -1,5 +1,9 @@
 # CakePHP 3
 
+.env
+
+composer.lock
+
 /vendor/*
 /config/app.php
 
