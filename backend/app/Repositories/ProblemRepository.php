@@ -16,27 +16,33 @@ final class ProblemRepository
      * Inserts a problem with the given title and description and returns
      * the auto-generated primary key.
      *
-     * @param string $title Problem title
-     * @param string $desc  Problem description
+     * @param string $title     Problem title
+     * @param string $desc      Problem description
+     * @param int    $crewId    The id that belongs to the crew
+     *                           which interact with the problem
+     * @param int   $userId     The id that belongs to the person
+     *                           who insert problem
      *
      * @return int ID of the newly created problem
      *
      * @throws PDOException If the insert operation fails
      */
-    public function create(string $title, string $desc): int
+    public function create(string $title, string $desc, int $crewId, int $userId): int
     {
         $stmt = $this->pdo->prepare(
-            "INSERT INTO problems (title, description)
-             VALUES (:t, :d)"
-        );
+                "INSERT INTO problems (title, description, crew_id, created_by, created_at)
+                VALUES (:t, :d, :c, :u, NOW())"
+            );
 
-        $stmt->execute([
-            't' => $title,
-            'd' => $desc
-        ]);
+            $stmt->execute([
+                't' => $title,
+                'd' => $desc,
+                'c' => $crewId,
+                'u' => $userId
+            ]);
 
-        return ((int) $this->pdo->lastInsertId());
-    }
+            return (int) $this->pdo->lastInsertId();
+        }
 
     /**
      * Retrieves a problem by its unique identifier.

@@ -83,13 +83,17 @@ final class ProblemController extends BaseController
         // ======== Validate Data from JSON ========
         Validator::validate($data, [
             'title'       => 'required|string',
-            'description' => 'required|string'
+            'description' => 'required|string',
+            'crew_id'     => 'required|int',
+            'user_id'     => 'required|int'
         ]);
 
         // ======== Create Problem ========
         $newId = $this->service->create(
             $data['title'], 
-            $data['description']
+            $data['description'],
+            $data['crew_id'],
+            $data['user_id']
         );
 
         // ======== Return Response ========
