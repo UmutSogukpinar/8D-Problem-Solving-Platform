@@ -35,15 +35,31 @@ final class Router
     }
 
     /**
-     * Dispatches the current HTTP request.
+     * Registers a POST route.
      *
-     * Resolves the HTTP method and request path from the server environment,
-     * finds a matching route handler, invokes it, and outputs the returned
-     * payload as JSON.
+     * @param string         $path    Request path (e.g. "/problems")
+     * @param callable|array $handler Route handler
      *
-     * If no route matches, a JSON 404 response is returned.
-     * 
-     * @throws RuntimeException If the route handler cannot be invoked
+     * @return void
+     */
+    public function post(string $path, callable|array $handler): void
+    {
+        $this->routes['POST'][$this->normalize($path)] = $handler;
+    }
+
+    /**
+     * Dispatches the current HTTP request to a registered route.
+     *
+     * Reads the HTTP method and request URI from the server environment,
+     * normalizes the path (query string is ignored), then attempts to resolve
+     * a matching route handler in this order:
+     *
+     * 1) Exact match (static routes), e.g. "/health"
+     * 2) Parameterized match (dynamic routes), e.g. "/users/{id}"
+     *    - "{param}" segments are treated as single path parts and matched as "([^/]+)"
+     *    - Parameter names are not used; only their order is used
+     *
+     * @throws RuntimeException If a matched route handler is invalid or cannot be invoked
      *
      * @return void
      */
@@ -51,60 +67,82 @@ final class Router
     {
         $method = strtoupper($_SERVER['REQUEST_METHOD'] ?? 'GET');
         $path = $this->normalize(
-            parse_url(
-                $_SERVER['REQUEST_URI'] ?? '/', 
-                PHP_URL_PATH) ?: '/'
+            parse_url($_SERVER['REQUEST_URI'] ?? '/',
+            PHP_URL_PATH) ?: '/'
         );
 
-        $handler = $this->routes[$method][$path] ?? null;
-
-        if ($handler === null)
+        if (isset($this->routes[$method][$path]))
         {
-            $this->sendJson(['error' => 'Route not found'], 404);
+            $handler = $this->routes[$method][$path];
+            $this->invoke($handler, []);
             return;
         }
 
-        $this->invoke($handler);
+        if (isset($this->routes[$method]))
+        {
+            foreach ($this->routes[$method] as $routePath => $handler) 
+            {
+                if (strpos($routePath, '{') === false)
+                {
+                    continue;
+                }
+
+                $pattern = preg_replace('/\{[a-zA-Z0-9_]+\}/', '([^/]+)', $routePath);
+                $pattern = "~^" . $pattern . "$~";
+
+                if (preg_match($pattern, $path, $matches))
+                {
+                    array_shift($matches);
+                    $this->invoke($handler, $matches); 
+                    return ;
+                }
+            }
+        }
+        $this->sendJson(['error' => 'Route not found'], 404);
     }
 
     /**
-     * Invokes the given route handler and outputs its result as JSON.
+     * Invokes a resolved route handler and outputs its return value as JSON.
      *
-     * - If the handler is callable, it is executed directly.
-     * - If the handler is an array [ControllerClass::class, 'method'], the controller
-     *   is resolved via the DI container and the given method is called.
+     * Supported handler formats:
+     * - callable (function/closure)
+     * - array{0: class-string, 1: string} (e.g. [ControllerClass::class, 'method'])
      *
-     * @param callable|array $handler Route handler to invoke
+     * For controller handlers, the controller instance is resolved through the DI container.
+     * Route variables (from dynamic routes) are forwarded as positional arguments.
+     *
+     * @param callable|array{0: class-string, 1: string} $handler The route handler to invoke
+     * @param array<int, string> $vars Positional route variables extracted from the path
+     *
+     * @throws RuntimeException If the handler format is invalid, the controller cannot be resolved,
+     *                          or the target method does not exist
      *
      * @return void
-     *
-     * @throws RuntimeException If the controller class/method cannot be resolved
      */
-    private function invoke(callable|array $handler): void
+    private function invoke(callable|array $handler, array $vars = []): void
     {
         $response = null;
 
-        if (is_callable($handler))
+        if (is_callable($handler) && !is_array($handler))
         {
-            $response = $handler();
+            $response = call_user_func_array($handler, $vars);
         }
         else if (is_array($handler) && count($handler) === 2)
         {
             [$class, $method] = $handler;
 
-            if (!class_exists($class))
-            {
-                throw new RuntimeException("Controller class not found: $class");
+            try {
+                $controller = $this->container->get($class);
+            } catch (RuntimeException $e) {
+                throw new RuntimeException("Controller instantiation failed: " . $e->getMessage());
             }
-            
-            $controller = $this->container->get($class);
 
             if (!method_exists($controller, $method))
             {
-                throw new RuntimeException("Method not found: $method in $class");
+                throw new RuntimeException("Method not found: {$method} in {$class}");
             }
 
-            $response = $controller->$method();
+            $response = call_user_func_array([$controller, $method], $vars);
         }
         else
         {

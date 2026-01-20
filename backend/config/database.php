@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-require_once ROOT_DIR . '/config/constants.php';
+require_once dirname(__DIR__) . '/config/constants.php';
 
 /**
  * Returns a shared PDO instance for database access.
