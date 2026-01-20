@@ -2,8 +2,6 @@
 
 declare(strict_types=1);
 
-use PDO;
-
 return function (PDO $pdo): void
 {
     $problemTitle = 'Login fails intermittently';

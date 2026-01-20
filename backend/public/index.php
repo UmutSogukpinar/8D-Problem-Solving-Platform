@@ -41,6 +41,8 @@ $container->bind(
 $router = new Router($container);
 
 // ======== Define Routes ========
-$router->get('/problems/health', [ProblemController::class, 'health']);
+
+require_once dirname(__DIR__) . '/routes/api.php';
 
 $router->dispatch();
+
