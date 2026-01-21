@@ -2,8 +2,15 @@
 
 use App\Controllers\ProblemController;
 use App\Controllers\RootCausesTreeController;
+use App\Controllers\CrewController;
 
 /** @var \App\Core\Router $router */
+
+// ========================= Problems Endpoint =========================
+$router->get('/8d/crew/health', [CrewController::class, 'health']);
+$router->get('/8d/crew', [CrewController::class, 'getAllCrews']);
+
+
 
 // ========================= Problems Endpoint =========================
 

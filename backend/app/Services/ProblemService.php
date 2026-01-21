@@ -45,29 +45,48 @@ final class ProblemService
     }
 
     /**
-     * Retrieves all problems from the repository.
+     * Retrieves all problems in a structured, API-ready format.
      *
-     * @return array List of all problem entities.
-     *                  If there is no records
-     *                  returns empty list
+     * Fetches raw problem records from the repository and transforms
+     * them into a nested array representation including creator
+     * and crew information.
+     *
+     * @return array<int, array{
+     *     id: int,
+     *     title: string,
+     *     description: string,
+     *     createdAt: string,
+     *     createdBy: array{
+     *         id: int,
+     *         name: string
+     *     },
+     *     crew: array{
+     *         id: int,
+     *         name: string
+     *     }
+     * }>
      */
     public function getAllProblems(): array
     {
         $rows = $this->repo->findAll();
 
-        return (array_map(static fn($r) => [
-            'id' => $r['id'],
-            'title' => $r['title'],
-            'description' => $r['description'],
-            'createdAt' => $r['created_at'],
-            'createdBy' => [
-                'id' => $r['created_by_id'],
-                'name' => $r['created_by_name'],
+        return (array_map(
+            static fn($r) => [
+                'id' => $r['id'],
+                'title' => $r['title'],
+                'description' => $r['description'],
+                'createdAt' => $r['created_at'],
+                'createdBy' => [
+                    'id' => $r['created_by_id'],
+                    'name' => $r['created_by_name'],
+                ],
+                'crew' => [
+                    'id' => $r['crew_id'],
+                    'name' => $r['crew_name'],
+                ],
             ],
-            'crew' => [
-                'id' => $r['crew_id'],
-                'name' => $r['crew_name'],
-            ],
-        ], $rows));
+            $rows
+        ));
     }
+
 }
