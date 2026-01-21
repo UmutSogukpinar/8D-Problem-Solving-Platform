@@ -43,4 +43,31 @@ final class ProblemService
     {
         return ($this->repo->findById($id));
     }
+
+    /**
+     * Retrieves all problems from the repository.
+     *
+     * @return array List of all problem entities.
+     *                  If there is no records
+     *                  returns empty list
+     */
+    public function getAllProblems(): array
+    {
+        $rows = $this->repo->findAll();
+
+        return (array_map(static fn($r) => [
+            'id' => $r['id'],
+            'title' => $r['title'],
+            'description' => $r['description'],
+            'createdAt' => $r['created_at'],
+            'createdBy' => [
+                'id' => $r['created_by_id'],
+                'name' => $r['created_by_name'],
+            ],
+            'crew' => [
+                'id' => $r['crew_id'],
+                'name' => $r['crew_name'],
+            ],
+        ], $rows));
+    }
 }

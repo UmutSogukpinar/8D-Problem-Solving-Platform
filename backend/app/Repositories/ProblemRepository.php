@@ -41,7 +41,7 @@ final class ProblemRepository
                 'u' => $userId
             ]);
 
-            return (int) $this->pdo->lastInsertId();
+            return ((int) $this->pdo->lastInsertId());
         }
 
     /**
@@ -65,5 +65,38 @@ final class ProblemRepository
         $stmt->execute(['id' => $id]);
 
         return ($stmt->fetch() ?: null);
+    }
+
+    /**
+    * Retrieves all records from the problems table.
+    *
+    * @return array List of problems as associative arrays.
+    */
+    public function findAll(): array
+    {
+        $stmt = $this->pdo->prepare(
+            "
+            SELECT
+                p.id,
+                p.title,
+                p.description,
+                p.created_at,
+
+                u.id   AS created_by_id,
+                u.name AS created_by_name,
+
+                c.id   AS crew_id,
+                c.name AS crew_name
+
+            FROM problems p
+            INNER JOIN users u ON u.id = p.created_by
+            INNER JOIN crews c ON c.id = p.crew_id
+            ORDER BY p.created_at DESC
+            "
+        );
+
+        $stmt->execute();
+
+        return ($stmt->fetchAll(\PDO::FETCH_ASSOC));
     }
 }

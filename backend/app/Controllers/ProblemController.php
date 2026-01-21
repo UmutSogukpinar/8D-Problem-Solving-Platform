@@ -38,6 +38,25 @@ final class ProblemController extends BaseController
     }
 
     /**
+     * Returns all problem resources.
+     *
+     * Request:
+     *  - Method: GET
+     *
+     * Responses:
+     *  - 200 OK                  on success
+     *
+     * @return mixed Prepared response payload.
+     */
+    public function getAllProblems(): mixed
+    {
+        return ($this->jsonResponse(
+            $this->service->getAllProblems(),
+            HTTP_OK
+        ));
+    }
+
+    /**
      * Returns a problem resource by its ID.
      *
      * Request:
