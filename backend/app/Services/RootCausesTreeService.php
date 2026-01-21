@@ -23,29 +23,156 @@ class RootCausesTreeService
         int $problemId,
         ?int $parentId,
         string $description
-    ): int
+    ): int 
     {
         return ($this->repository->create(
-            $problemId,
-            $parentId,
-            $description
-        ));
+                    $problemId,
+                    $parentId,
+                    $description
+            )
+        );
     }
 
     /**
-     * Retrieves the root cause tree for a specific problem.
+     * Retrieves a root cause tree node along with its related problem details.
      *
-     * @param int $problemId The unique identifier of the problem.
+     * @param int $id ID of the root cause tree node
      *
-     * @return array Hierarchical array representing the root cause tree.
+     * @return array{
+     *     problem: array{
+     *         id: int,
+     *         title: string,
+     *         description: string,
+     *         createdAt: string,
+     *         author: array{id:int, name:string},
+     *         crew: array{id:int, name:string}
+     *     },
+     *     node: array{
+     *         id: int,
+     *         parentId: int|null,
+     *         description: string,
+     *         createdAt: string
+     *     }
+     * }|null
+     */
+    public function getById(int $id): ?array
+        {
+            $row = $this->repository->findById($id);
+
+            if (!$row) 
+            {
+                return (null);
+            }
+
+            $nodes = $this->mapRawNodes([$row]);
+
+            return (
+                [
+                    'problem' => $this->extractProblemDetails($row),
+                    'node'    => $nodes[0]
+                ]
+            );
+        }
+
+    /**
+     * Returns the problem details and its root cause tree structure.
+     *
+     * @param int $problemId ID of the problem
+     *
+     * @return array{
+     *     problem: array|null,
+     *     tree: array
+     * }
      */
     public function getTreeByProblemId(int $problemId): array
     {
-        $rawMap = $this->repository->findTreeByProblemId($problemId);
-        
-        $nodeMap = $this->buildTree($rawMap);
-        
-        return ($nodeMap);
+        $rawList = $this->repository->findTreeByProblemId($problemId);
+
+        if (empty($rawList))
+        {
+            return (
+                [
+                    'problem' => null,
+                    'tree'    => []
+                ]
+            );
+        }
+
+        return (
+            [
+                'problem' => $this->extractProblemDetails($rawList[0]),
+                'tree'    => $this->buildTree(
+                    $this->mapRawNodes($rawList)
+                )
+            ]
+        );
+    }
+
+    /**
+     * Extracts problem-level details from a raw database row.
+     *
+     * @param array $row Raw database row containing problem data
+     *
+     * @return array{
+     *     id: int,
+     *     title: string,
+     *     description: string,
+     *     createdAt: string,
+     *     author: array{id:int, name:string},
+     *     crew: array{id:int, name:string}
+     * }
+     */
+    private function extractProblemDetails(array $row): array
+    {
+        return (
+            [
+                'id'          => $row['problem_id'],
+                'title'       => $row['problem_title'],
+                'description' => $row['problem_description'],
+                'createdAt'   => $row['problem_created_at'],
+                'author'      => [
+                    'id'   => $row['created_by_id'],
+                    'name' => $row['created_by_name'],
+                ],
+                'crew'        => [
+                    'id'   => $row['crew_id'],
+                    'name' => $row['crew_name'],
+                ]
+            ]
+        );
+    }
+
+    /**
+     * Maps raw database rows into a normalized node list
+     * suitable for building a hierarchical tree.
+     *
+     * @param array $rawList Flat list of raw node rows
+     *
+     * @return array<int, array{
+     *     id: int,
+     *     parentId: int|null,
+     *     description: string,
+     *     createdAt: string
+     * }>
+     */
+    private function mapRawNodes(array $rawList): array
+    {
+        return (
+            array_map(
+                function (array $row): array
+                {
+                    return (
+                        [
+                            'id'          => $row['id'],
+                            'parentId'    => $row['parent_id'],
+                            'description' => $row['description'],
+                            'createdAt'   => $row['created_at'],
+                        ]
+                    );
+                },
+                $rawList
+            )
+        );
     }
 
     /**
@@ -57,47 +184,33 @@ class RootCausesTreeService
      */
     private function buildTree(array $elements): array
     {
-        $branch = [];
-        $keyed = [];
+        $tree = [];
+        $nodesById = [];
 
-        foreach ($elements as $element) 
+        foreach ($elements as $element)
         {
             $element['children'] = [];
-            $keyed[$element['id']] = $element;
+            $nodesById[$element['id']] = $element;
         }
 
-        foreach ($keyed as $id => &$node)
+        foreach ($nodesById as $id => &$node) 
         {
-            $parentId = $node['parent_id'];
+            $parentId = $node['parentId'];
 
             if ($parentId === null) 
             {
-                $branch[] = &$node;
-            } 
+                $tree[] = &$node;
+            }
             else
             {
-                if (isset($keyed[$parentId]))
+                if (isset($nodesById[$parentId]))
                 {
-                    $keyed[$parentId]['children'][] = &$node;
+                    $nodesById[$parentId]['children'][] = &$node;
                 }
             }
         }
 
-        return ($branch);
-    }
-
-    /**
-     * Retrieves a root cause node by its unique identifier.
-     *
-     * @param int $id Root cause tree node ID
-     *
-     * @return array|null
-     *         Associative array containing the root cause data,
-     *         or null if the node does not exist.
-     */
-    public function getById(int $id): ?array
-    {
-        return ($this->repository->findById($id));
+        return ($tree);
     }
 
 }

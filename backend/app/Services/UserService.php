@@ -29,12 +29,12 @@ final class UserService
 
         return (
             [
-                'user_id' => $r['user_id'],
-                'user_name' => $r['user_name'],
-                'user_email' => $r['user_email'],
+                'userId' => $r['user_id'],
+                'username' => $r['user_name'],
+                'userEmail' => $r['user_email'],
                 'crew' => [
-                    'crew_id' => $r['crew_id'],
-                    'crew_name' => $r['crew_name'],
+                    'id' => $r['crew_id'],
+                    'name' => $r['crew_name'],
                 ],
             ]
         );

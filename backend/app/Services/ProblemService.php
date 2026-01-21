@@ -76,10 +76,12 @@ final class ProblemService
                 'title' => $r['title'],
                 'description' => $r['description'],
                 'createdAt' => $r['created_at'],
+
                 'createdBy' => [
                     'id' => $r['created_by_id'],
                     'name' => $r['created_by_name'],
                 ],
+                
                 'crew' => [
                     'id' => $r['crew_id'],
                     'name' => $r['crew_name'],
