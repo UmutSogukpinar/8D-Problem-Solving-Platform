@@ -7,29 +7,30 @@ use App\Controllers\RootCausesTreeController;
 
 // ========================= Problems Endpoint =========================
 
-$router->get('/problems/health', [ProblemController::class, 'health']);
-$router->get('/problems/{id}', [ProblemController::class, 'getProblem']);
-$router->post('/problems', [ProblemController::class, 'store']);
+$router->get('/8d/problems/health', [ProblemController::class, 'health']);
+$router->get('/8d/problems', [ProblemController::class, 'getAllProblems']);
+$router->get('/8d/problems/{id}', [ProblemController::class, 'getProblem']);
+$router->post('/8d/problems', [ProblemController::class, 'store']);
 
 
 // ======================= RootCausesTree Endpoint =======================
 
 $router->get(
-    '/rootcauses/health',
+    '/8d/rootcauses/health',
     [RootCausesTreeController::class, 'health']
 );
 
 $router->get(
-    '/rootcauses/{id}', 
+    '/8d/rootcauses/{id}', 
     [RootCausesTreeController::class, 'getRootCauseNode']
 );
 
 $router->get(
-    '/rootcauses/{problem_id}/tree', 
+    '/8d/rootcauses/{problem_id}/tree', 
     [RootCausesTreeController::class, 'getTreeByProblemId']
 );
 
 $router->post(
-    '/rootcauses',
+    '/8d/rootcauses',
     [RootCausesTreeController::class, 'store']
 );
