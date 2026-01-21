@@ -11,11 +11,43 @@ export default function ProblemsGrid()
 	const [error, setError] = useState(null);
 
 	const [columnDefs] = useState(() => ([
-		{ field: "id", maxWidth: 90 },
-		{ field: "title", sortable: true, filter: true, flex: 1 },
-		{ field: "status", sortable: true, filter: true, maxWidth: 140 },
-		{ field: "created_at", headerName: "Created", sortable: true, filter: true, maxWidth: 160 }
-	]));
+
+        { 
+            field: "id", 
+            headerName: "ID", 
+            width: 70, 
+            suppressSizeToFit: true 
+        },
+        
+        { 
+            field: "title", 
+            headerName: "Title",
+            sortable: true, 
+            filter: true, 
+            flex: 1,
+            minWidth: 150 
+        },
+
+        { 
+            field: "description", 
+            headerName: "Description",
+            sortable: true, 
+            filter: true, 
+            flex: 2,
+            minWidth: 300,
+            wrapText: true,
+            autoHeight: true
+        },
+        
+        { 
+            field: "createdAt", 
+            headerName: "Created At", 
+            sortable: true, 
+            filter: true, 
+            width: 180,
+            minWidth: 150
+        }
+    ]));
 
 	useEffect(() =>
 	{
@@ -28,8 +60,7 @@ export default function ProblemsGrid()
 				setLoading(true);
 				setError(null);
 
-				// TODO: Put real endpoint here
-				const res = await fetch("http://localhost/problems", {
+				const res = await fetch("http://localhost/8d/problems", {
 					headers: { "Accept": "application/json" }
 				});
 
@@ -62,8 +93,9 @@ export default function ProblemsGrid()
 		return <div style={{ padding: 12 }}>API Error: {error}</div>;
 
 	return (
-		<div className="ag-theme-alpine" style={{ height: "70vh", width: "100%" }}>
+		<div className="ag-theme-alpine" style={{ height: "70vh", width: "80%"}}>
 			<AgGridReact
+				theme="themeQuartz"
 				rowData={rowData}
 				columnDefs={columnDefs}
 				loading={loading}

@@ -1,5 +1,6 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import AppFrame from "./components/AppFrame";
+import ProblemDashboard from "./pages/ProblemDashboard"
 
 function Home() {
   return <div>Home</div>;
@@ -18,7 +19,7 @@ export default function App() {
     <Routes>
       <Route element={<AppFrame />}>
         <Route path="/" element={<Home />} />
-        <Route path="/dashboard" element={<Problems />} />
+        <Route path="/dashboard" element={<ProblemDashboard />} />
         <Route path="/404" element={<NotFound />} />
         <Route path="*" element={<Navigate to="/404" replace />} />
       </Route>
