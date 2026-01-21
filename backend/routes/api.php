@@ -17,6 +17,8 @@ $router->get('/8d/crew', [CrewController::class, 'getAllCrews']);
 
 $router->get('/8d/user/health', [UserController::class, 'health']);
 $router->get('/8d/user/{id}', [UserController::class, 'getUser']);
+$router->get('/8d/me', [UserController::class, 'me']);
+
 
 // ========================= Problems Endpoint =========================
 

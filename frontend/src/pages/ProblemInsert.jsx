@@ -1,46 +1,51 @@
 import { useEffect, useState } from "react";
 import Form from "../components/Form";
+import Spinner from "../components/Spinner";
+import { apiFetch } from "../api/client";
 
-const ProblemInsert = () => {
-  const [crews, setCrews] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+const ProblemInsert = () =>
+{
+	const [crews, setCrews] = useState([]);
+	const [loading, setLoading] = useState(true);
+	const [error, setError] = useState(null);
 
-  useEffect(() => {
-    async function fetchCrews() {
-      try {
-        setLoading(true);
-        setError(null);
+	useEffect(() =>
+	{
+		async function fetchCrews()
+		{
+			try
+			{
+				setLoading(true);
+				setError(null);
 
-        const res = await fetch("http://localhost/8d/crew");
+				const data = await apiFetch("/8d/crew");
 
-        if (!res.ok) 
-        {
-          throw new Error(`HTTP ${res.status}`);
-        }
+				setCrews(data);
+			}
+			catch (e)
+			{
+				setError(e.message ?? "Failed to load crews");
+			}
+			finally
+			{
+				setLoading(false);
+			}
+		}
 
-        const json = await res.json();
+		fetchCrews();
+	}, []);
 
-        setCrews(json);
-      } catch (e) {
-        setError(e.message ?? "Failed to load crews");
-      } finally {
-        setLoading(false);
-      }
-    }
+	if (loading)
+	{
+		return (<Spinner />);
+	}
 
-    fetchCrews();
-  }, []);
+	if (error)
+	{
+		return (<div style={{ color: "red" }}>{error}</div>);
+	}
 
-  if (loading) {
-    return <div>Loading...</div>;
-  }
-
-  if (error) {
-    return <div style={{ color: "red" }}>{error}</div>;
-  }
-
-  return <Form crews={crews} />;
+	return (<Form crews={crews} />);
 };
 
 export default ProblemInsert;

@@ -17,7 +17,7 @@ const Form = ({ crews }) => {
 
   return (
     <IxLayoutAuto>
-      <IxFieldLabel htmlFor="crew-select">Crew</IxFieldLabel>
+      <IxFieldLabel htmlFor="crew-select">Assigned Crew</IxFieldLabel>
 
       <IxSelect 
         id="crew-select" 
