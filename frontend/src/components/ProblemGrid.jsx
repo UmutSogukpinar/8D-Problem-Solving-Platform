@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { AgGridReact } from "ag-grid-react";
+import * as agGrid from "ag-grid-community";
+import { getIxTheme } from "@siemens/ix-aggrid";
 import { apiFetch } from "../api/client";
 
+const ixTheme = getIxTheme(agGrid);
 
 export default function ProblemsGrid() {
   const [rowData, setRowData] = useState([]);
@@ -15,7 +18,6 @@ export default function ProblemsGrid() {
       width: 90,
       suppressSizeToFit: true,
     },
-
     {
       field: "title",
       headerName: "Title",
@@ -24,7 +26,6 @@ export default function ProblemsGrid() {
       flex: 1,
       minWidth: 150,
     },
-
     {
       field: "description",
       headerName: "Description",
@@ -35,7 +36,6 @@ export default function ProblemsGrid() {
       wrapText: true,
       autoHeight: true,
     },
-
     {
       field: "createdAt",
       headerName: "Created At",
@@ -77,8 +77,9 @@ export default function ProblemsGrid() {
   }
 
   return (
-    <div className="ag-theme-alpine" style={{ height: "70vh", width: "80%" }}>
+    <div style={{ height: "70vh", width: "80%" }}>
       <AgGridReact
+        theme={ixTheme}
         rowData={rowData}
         columnDefs={columnDefs}
         loading={loading}
