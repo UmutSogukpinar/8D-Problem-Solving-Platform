@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useRef, useState, useEffect } from "react";
+import React, {useState, useEffect } from "react";
 import { AgGridReact } from "ag-grid-react";
 
 import "ag-grid-community/styles/ag-grid.css";
@@ -15,7 +15,7 @@ export default function ProblemsGrid()
         { 
             field: "id", 
             headerName: "ID", 
-            width: 70, 
+            width: 90, 
             suppressSizeToFit: true 
         },
         

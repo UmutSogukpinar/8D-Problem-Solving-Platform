@@ -1,2 +1,5 @@
 @import '@siemens/ix/dist/siemens-ix/siemens-ix.css';
 
+*{
+    box-sizing: border-box;
+}

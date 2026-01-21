@@ -50,7 +50,7 @@ export default function AppFrame()
 
 			<IxMenu>
 				<IxMenuItem icon={iconHome} onClick={() => navigate("/")}>Home</IxMenuItem>
-				<IxMenuItem icon={iconCertificateError} onClick={() => navigate("/dashboard")}>Problems</IxMenuItem>
+				<IxMenuItem icon={iconCertificateError} onClick={() => navigate("/problem/dashboard")}>Problems</IxMenuItem>
 			</IxMenu>
 
 			<IxContent>
