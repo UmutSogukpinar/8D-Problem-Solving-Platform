@@ -84,26 +84,25 @@ class RootCausesTreeService
      *     tree: array
      * }
      */
-    public function getTreeByProblemId(int $problemId): array
+    public function getTreeByProblemId(int $problemId): ?array
     {
         $rawList = $this->repository->findTreeByProblemId($problemId);
 
-        if (empty($rawList))
+        if ($rawList == null)
         {
-            return (
-                [
-                    'problem' => null,
-                    'tree'    => []
-                ]
-            );
+            return (null);
         }
+
+        $firstRow = current($rawList);
+        $hasNodes = !empty($firstRow['id']);
 
         return (
             [
-                'problem' => $this->extractProblemDetails($rawList[0]),
-                'tree'    => $this->buildTree(
-                    $this->mapRawNodes($rawList)
-                )
+                'problem' => $this->extractProblemDetails($firstRow),
+
+                'tree' => $hasNodes 
+                    ? $this->buildTree($this->mapRawNodes($rawList)) 
+                    : []
             ]
         );
     }

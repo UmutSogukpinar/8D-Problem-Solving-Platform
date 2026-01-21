@@ -6,6 +6,7 @@ namespace App\Controllers;
 
 use App\Core\Validator;
 use App\Core\Request;
+use App\Exceptions\NotFoundException;
 use App\Services\RootCausesTreeService;
 
 class RootCausesTreeController extends BaseController
@@ -15,6 +16,27 @@ class RootCausesTreeController extends BaseController
         private RootCausesTreeService $service
     ) {}
 
+	/**
+     * Health check endpoint for the RootCausesTreeController.
+     *
+     * Request:
+     *  - Method: GET
+     *
+     * Responses:
+     *  - 200 OK on success
+     *
+     * @return mixed Prepared response payload.
+     */
+    public function health(): mixed
+    {
+        return (
+            $this->jsonResponse(
+                ['status' => 'RootCausesTreeController is healthy'],
+                HTTP_OK
+            )
+        );
+    }
+
     /**
      * Retrieves a root cause tree node by its identifier.
      *
@@ -23,7 +45,7 @@ class RootCausesTreeController extends BaseController
      * 
      * Responses:
      * - 200 OK                  on success
-     * - 404 Not Found            if the node does not exist
+     * - 404 Not Found           if the node does not exist
      *
      * @param int $id The unique identifier of the root cause node.
      *
@@ -34,7 +56,6 @@ class RootCausesTreeController extends BaseController
         return ($this->get($id, [$this->service, 'getById']));
     }
 
-    // TODO: Check later
     /**
      * Retrieves the root cause tree for a given problem.
      *
@@ -43,7 +64,7 @@ class RootCausesTreeController extends BaseController
      * 
      * Responses:
      * - 200 OK                  on success
-     * - 404 Not Found            if the problem does not exist
+     * - 404 Not Found           if the problem does not exist
      *
      * @param int $problemId The unique identifier of the problem.
      *
@@ -51,8 +72,15 @@ class RootCausesTreeController extends BaseController
      */
     public function getTreeByProblemId(int $problemId): mixed
     {
+        $result = $this->service->getTreeByProblemId($problemId);
+
+        if ($result == null)
+        {
+            throw new NotFoundException($problemId, "Problem");
+        }
+
         return ($this->jsonResponse(
-            $this->service->getTreeByProblemId($problemId),
+            $result, 
             HTTP_OK
         ));
     }

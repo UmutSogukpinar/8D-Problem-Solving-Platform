@@ -167,18 +167,11 @@ final class RootCausesTreeRepository
 	 *
 	 * @throws PDOException If the query execution fails.
 	 */
-	public function findTreeByProblemId(int $problemId): array
+	public function findTreeByProblemId(int $problemId): ?array
     {
         $stmt = $this->pdo->prepare(
             "
             SELECT
-                rct.id          AS id, 
-                rct.parent_id   AS parent_id,
-                
-                rct.problem_id  AS node_problem_id,
-                rct.description AS description,
-                rct.created_at  AS created_at,
-
                 p.id            AS problem_id,
                 p.title         AS problem_title,
                 p.description   AS problem_description,
@@ -187,19 +180,34 @@ final class RootCausesTreeRepository
                 u.id            AS created_by_id,
                 u.name          AS created_by_name,
                 c.id            AS crew_id,
-                c.name          AS crew_name
+                c.name          AS crew_name,
 
-            FROM root_causes_tree rct
-            INNER JOIN problems p ON p.id = rct.problem_id
+                rct.id          AS id, 
+                rct.parent_id   AS parent_id,
+                rct.description AS description,
+                rct.created_at  AS created_at
+
+            FROM problems p
+
+            LEFT JOIN root_causes_tree rct ON rct.problem_id = p.id
+            
             INNER JOIN users u    ON u.id = p.created_by
             INNER JOIN crews c    ON c.id = p.crew_id
-            WHERE rct.problem_id = :problem_id
+            
+            WHERE p.id = :problem_id
+            
             ORDER BY rct.created_at ASC, rct.id ASC
             "
         );
 
         $stmt->execute(['problem_id' => $problemId]);
+        $result = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
-        return ($stmt->fetchAll(\PDO::FETCH_ASSOC));
+        if (empty($result))
+		{
+            return (null);
+        }
+		
+        return ($result);
     }
 }

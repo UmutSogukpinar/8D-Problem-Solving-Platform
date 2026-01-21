@@ -35,7 +35,7 @@ class BaseController
 
         if ($data === null)
         {
-            throw new NotFoundException();
+            throw new NotFoundException($id);
         }
 
         return ($this->jsonResponse($data, HTTP_OK));
