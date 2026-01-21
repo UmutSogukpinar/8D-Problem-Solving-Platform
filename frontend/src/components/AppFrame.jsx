@@ -1,96 +1,81 @@
 import { useState, useEffect } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
-import { apiFetch } from "../api/client";
+import { useUser } from "../context/UserContext";
 import {
-  IxApplication,
-  IxApplicationHeader,
-  IxContent,
-  IxContentHeader,
-  IxMenu,
-  IxMenuItem,
-  IxIconButton,
-  IxAvatar,
+	IxApplication,
+	IxApplicationHeader,
+	IxContent,
+	IxContentHeader,
+	IxMenu,
+	IxMenuItem,
+	IxIconButton,
+	IxAvatar,
 } from "@siemens/ix-react";
 import {
-  iconSun,
-  iconMoon,
-  iconHome,
-  iconCertificateError,
+	iconSun,
+	iconMoon,
+	iconHome,
+	iconCertificateError,
+	iconAlarmFilled
 } from "@siemens/ix-icons/icons";
 
+
 export default function AppFrame() {
-  const [schema, setSchema] = useState("dark");
-  const [user, setUser] = useState(null);
-  const navigate = useNavigate();
+	const [schema, setSchema] = useState("dark");
+	const navigate = useNavigate();
 
-  useEffect(() => {
-    const root = document.documentElement;
-    root.setAttribute("data-ix-color-schema", schema);
-    root.setAttribute("data-ix-theme", "classic");
-  }, [schema]);
+	const { user } = useUser();
 
-  useEffect(() => {
-    let cancelled = false;
+	useEffect(() => {
 
-    async function loadMe() {
-      try {
-        const me = await apiFetch("/8d/me");
+		const root = document.documentElement;
+		root.setAttribute("data-ix-color-schema", schema);
+		root.setAttribute("data-ix-theme", "classic");
 
-        if (!cancelled) setUser(me);
-      } catch {
-        if (!cancelled) setUser(null);
-      }
-    }
+	}, [schema]);
 
-    loadMe();
+	const username = user?.username ?? "Guest";
+	const extra = user?.crew?.name ?? "User";
 
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+	return (
+		<IxApplication>
+			<IxApplicationHeader name="My Application">
+				<div className="placeholder-logo" slot="logo"></div>
 
-  const username = user?.user_name ?? "Guest";
-  const extra = user?.crew?.crew_name ?? "User";
+				<IxIconButton
+					variant="tertiary"
+					icon={schema === "dark" ? iconSun : iconMoon}
+					onClick={() =>
+						setSchema((prev) => (prev === "dark" ? "light" : "dark"))
+					}
+					title={
+						schema === "dark" ? "Switch to light mode" : "Switch to dark mode"
+					}
+				/>
 
-  return (
-    <IxApplication>
-      <IxApplicationHeader name="My Application">
-        <div className="placeholder-logo" slot="logo"></div>
+				<IxAvatar
+					username={username}
+					extra={extra}
+					image="https://www.gravatar.com/avatar/00000000000000000000000000000000"
+				/>
+			</IxApplicationHeader>
 
-        <IxIconButton
-          variant="tertiary"
-          icon={schema === "dark" ? iconSun : iconMoon}
-          onClick={() =>
-            setSchema((prev) => (prev === "dark" ? "light" : "dark"))
-          }
-          title={
-            schema === "dark" ? "Switch to light mode" : "Switch to dark mode"
-          }
-        />
+			<IxMenu>
+				<IxMenuItem icon={iconHome} onClick={() => navigate("/")}>
+					Home
+				</IxMenuItem>
+				<IxMenuItem
+					icon={iconAlarmFilled}
+					onClick={() => navigate("/problem/dashboard")}
+				>
+					Problems
+				</IxMenuItem>
+			</IxMenu>
 
-        <IxAvatar
-          username={username}
-          extra={extra}
-          image="https://www.gravatar.com/avatar/00000000000000000000000000000000"
-        />
-      </IxApplicationHeader>
-
-      <IxMenu>
-        <IxMenuItem icon={iconHome} onClick={() => navigate("/")}>
-          Home
-        </IxMenuItem>
-        <IxMenuItem
-          icon={iconCertificateError}
-          onClick={() => navigate("/problem/dashboard")}
-        >
-          Problems
-        </IxMenuItem>
-      </IxMenu>
-
-      <IxContent>
-        <IxContentHeader slot="header" headerTitle="My Content Page" />
-        <Outlet />
-      </IxContent>
-    </IxApplication>
-  );
+			<IxContent>
+				<IxContentHeader slot="header" headerTitle="My Content Page" />
+				<Outlet />
+			</IxContent>
+		</IxApplication>
+	);
 }

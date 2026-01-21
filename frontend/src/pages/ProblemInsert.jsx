@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import {useUser} from "../context/UserContext"
 import Form from "../components/Form";
 import Spinner from "../components/Spinner";
 import { apiFetch } from "../api/client";
@@ -9,6 +10,8 @@ const ProblemInsert = () =>
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState(null);
 
+	const { user } = useUser();
+	
 	useEffect(() =>
 	{
 		async function fetchCrews()
@@ -45,7 +48,7 @@ const ProblemInsert = () =>
 		return (<div style={{ color: "red" }}>{error}</div>);
 	}
 
-	return (<Form crews={crews} />);
+	return (<Form crews={crews} user={user} />);
 };
 
 export default ProblemInsert;

@@ -1,5 +1,4 @@
 import { IxButton } from "@siemens/ix-react";
-import "./css/button.css"
 import { useNavigate } from "react-router-dom";
 
 const InsertButton = () => {

@@ -7,85 +7,95 @@ import { apiFetch } from "../api/client";
 const ixTheme = getIxTheme(agGrid);
 
 export default function ProblemsGrid() {
-  const [rowData, setRowData] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+	const [rowData, setRowData] = useState([]);
+	const [loading, setLoading] = useState(true);
+	const [error, setError] = useState(null);
 
-  const [columnDefs] = useState(() => [
-    {
-      field: "id",
-      headerName: "ID",
-      width: 90,
-      suppressSizeToFit: true,
-    },
-    {
-      field: "title",
-      headerName: "Title",
-      sortable: true,
-      filter: true,
-      flex: 1,
-      minWidth: 150,
-    },
-    {
-      field: "description",
-      headerName: "Description",
-      sortable: true,
-      filter: true,
-      flex: 2,
-      minWidth: 300,
-      wrapText: true,
-      autoHeight: true,
-    },
-    {
-      field: "createdAt",
-      headerName: "Created At",
-      sortable: true,
-      filter: true,
-      width: 180,
-      minWidth: 150,
-    },
-  ]);
+	const [columnDefs] = useState(() => [
+		{
+			field: "id",
+			headerName: "ID",
+			width: 90,
+			suppressSizeToFit: true,
+		},
 
-  useEffect(() => {
-    let cancelled = false;
+		{
+			field: "title",
+			headerName: "Title",
+			sortable: true,
+			filter: true,
+			flex: 1,
+			minWidth: 150,
+		},
 
-    async function load() {
-      try {
-        setLoading(true);
-        setError(null);
+		{
+			field: "description",
+			headerName: "Description",
+			sortable: true,
+			filter: true,
+			flex: 2,
+			minWidth: 300,
+			wrapText: true,
+			autoHeight: true,
+		},
 
-        const data = await apiFetch("/8d/problems");
+		{
+			field: "createdAt",
+			headerName: "Created At",
+			sortable: true,
+			filter: true,
+			width: 180,
+			minWidth: 150,
+		}
+	]);
 
-        if (!cancelled)
-          setRowData(Array.isArray(data) ? data : (data.data ?? []));
-      } catch (e) {
-        if (!cancelled) setError(e.message ?? "Request failed");
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    }
+	useEffect(() => {
+		let cancelled = false;
 
-    load();
+		async function load()
+		{
+			try
+			{
+				setLoading(true);
+				setError(null);
 
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+				const data = await apiFetch("/8d/problems");
 
-  if (error) {
-    return <div style={{ padding: 12 }}>API Error: {error}</div>;
-  }
+				if (!cancelled)
+					setRowData(Array.isArray(data) ? data : (data.data ?? []));
+			}
+			catch (e)
+			{
+				if (!cancelled) setError(e.message ?? "Request failed");
+			}
+			finally
+			{
+				if (!cancelled) setLoading(false);
+			}
 
-  return (
-    <div style={{ height: "70vh", width: "80%" }}>
-      <AgGridReact
-        theme={ixTheme}
-        rowData={rowData}
-        columnDefs={columnDefs}
-        loading={loading}
-        pagination={true}
-        paginationPageSize={20}
-      />
-    </div>
-  );
+		}
+
+		load();
+
+		return () => {
+			cancelled = true;
+		};
+	}, []);
+
+	if (error) {
+		return <div style={{ padding: 12 }}>API Error: {error}</div>;
+	}
+
+	return (
+		<div style={{ height: "70vh", width: "80%" }}>
+			<AgGridReact
+				theme={ixTheme}
+				rowData={rowData}
+				columnDefs={columnDefs}
+				loading={loading}
+				pagination={true}
+				paginationPageSize={20}
+			/>
+		</div>
+	);
 }
