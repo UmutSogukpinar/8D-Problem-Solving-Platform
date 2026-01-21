@@ -4,18 +4,16 @@ declare(strict_types=1);
 
 namespace App\Controllers;
 
-use App\Core\Request;
-use App\Services\CrewService;
+use App\Services\UserService;
 
-
-final class CrewController extends BaseController
+final class UserController extends BaseController
 {
     public function __construct(
-        private CrewService $service
+        private UserService $service
     ) {}
 
     /**
-     * Health check endpoint for the CrewController.
+     * Health check endpoint for the UserController.
      *
      * Request:
      *  - Method: GET
@@ -29,27 +27,30 @@ final class CrewController extends BaseController
     {
         return (
             $this->jsonResponse(
-                ['status' => 'CrewController is healthy'],
+                ['status' => 'UserController is healthy'],
                 HTTP_OK
-            ));
+            )
+        );
     }
 
     /**
-     * Retrieves all crews.
+     * Retrieves a single user by its identifier.
      *
      * Request:
      *  - Method: GET
+     *  - Params:
+     *      - id (int): User identifier
      *
      * Responses:
      *  - 200 OK on success
      *
-     * @return mixed Prepared response payload containing the list of crews.
+     * @return mixed Prepared response payload containing user data.
      */
-    public function getAllCrews(): mixed
+    public function getUser(int $id): mixed
     {
         return (
             $this->jsonResponse(
-                $this->service->getAllCrews(),
+                $this->service->getUser($id),
                 HTTP_OK
             )
         );

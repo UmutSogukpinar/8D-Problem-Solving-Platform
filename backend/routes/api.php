@@ -3,14 +3,20 @@
 use App\Controllers\ProblemController;
 use App\Controllers\RootCausesTreeController;
 use App\Controllers\CrewController;
+use App\Controllers\UserController;
 
 /** @var \App\Core\Router $router */
 
-// ========================= Problems Endpoint =========================
+// ========================= Crew Endpoint =========================
+
 $router->get('/8d/crew/health', [CrewController::class, 'health']);
 $router->get('/8d/crew', [CrewController::class, 'getAllCrews']);
 
 
+// ========================= User Endpoint =========================
+
+$router->get('/8d/user/health', [UserController::class, 'health']);
+$router->get('/8d/user/{id}', [UserController::class, 'getUser']);
 
 // ========================= Problems Endpoint =========================
 

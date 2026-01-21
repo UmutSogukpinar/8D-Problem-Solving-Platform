@@ -6,7 +6,6 @@ use App\Core\Container;
 use App\Core\Router;
 use App\Core\Request;
 use App\Core\GlobalErrorHandler;
-use App\Controllers\ProblemController;
 
 require_once dirname(__DIR__) . '/vendor/autoload.php';
 require_once dirname(__DIR__) . '/utils/logger.php';

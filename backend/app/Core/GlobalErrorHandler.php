@@ -30,7 +30,7 @@ class GlobalErrorHandler
         // Ensure status code is within valid HTTP range
         if ($statusCode < 100 || $statusCode > 599)
         {
-            $statusCode = 500;
+            $statusCode = HTTP_INTERNAL_SERVER_ERROR;
         }
 
         // Log the error

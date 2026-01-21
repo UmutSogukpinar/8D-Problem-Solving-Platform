@@ -24,7 +24,7 @@ final class CrewService
      *     name: string
      * }>
      */
-    public function getAllCrews()
+    public function getAllCrews(): array
     {
         $rows = $this->repository->findAll();
 
