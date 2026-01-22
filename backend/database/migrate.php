@@ -10,37 +10,61 @@ initLogger();
 
 $pdo = getPdo();
 
+$pdo->exec("
+    CREATE TABLE IF NOT EXISTS migrations (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        migration VARCHAR(255) NOT NULL,
+        executed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+");
+
+$executedMigrations = $pdo->query("SELECT migration FROM migrations")->fetchAll(PDO::FETCH_COLUMN);
+
 $migrationFiles = glob(ROOT_DIR . '/migrations/*.php');
 sort($migrationFiles);
 
-$pdo->beginTransaction();
-
 try
 {
+    $executedCount = 0;
+
     foreach ($migrationFiles as $file)
     {
+        $fileName = basename($file);
+
+        if (in_array($fileName, $executedMigrations)) {
+            continue; 
+        }
+
         $sql = null;
         require $file;
 
         if (!is_string($sql) || trim($sql) === '')
         {
-            throw new RuntimeException(
-                'Migration did not define $sql as a non-empty string'
-            );
+            logMessage(WARNING, "Migration file $fileName did not define valid SQL. Skipping.");
+            continue;
         }
 
         $pdo->exec($sql);
-        logMessage(INFO, basename($file) . ' executed');
-    }
+        
+        $stmt = $pdo->prepare("INSERT INTO migrations (migration) VALUES (?)");
+        $stmt->execute([$fileName]);
 
-    logMessage(INFO, 'All migrations completed');
+        logMessage(INFO, $fileName . ' executed successfully.');
+        $executedCount++;
+    }
+    
+    if ($executedCount > 0) 
+    {
+        logMessage(INFO, "$executedCount new migrations completed.");
+    } 
+    else 
+    {
+        logMessage(INFO, "Nothing to migrate.");
+    }
 }
 catch (Throwable $e)
 {
-    if ($pdo->inTransaction()) 
-    {
-        $pdo->rollBack();
-    }
     logMessage(ERROR, 'Migration failed: ' . $e->getMessage());
+
     exit(1);
 }

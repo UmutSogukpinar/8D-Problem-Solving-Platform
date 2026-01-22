@@ -17,7 +17,6 @@ const ViewActionRenderer = (params) => {
     const navigate = useNavigate();
 
     const handleClick = () => {
-        console.log(params.data.id)
         navigate(`/problems/${params.data.id}`);
     };
 

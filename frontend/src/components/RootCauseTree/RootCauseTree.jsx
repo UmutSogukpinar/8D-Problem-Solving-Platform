@@ -1,21 +1,41 @@
 import { useMemo } from "react";
-import NodeCard from "./NodeCard.jsx";
-import { buildTree } from "../../utils/buildTree.js";
+import NodeCard from "./NodeCard";
+import { buildTree } from "../../utils/buildTree";
+import { apiFetch } from "../../api/client";
+import { useUser } from "../../context/UserContext";
 
-export default function RootCauseTree({ nodes })
+export default function RootCauseTree({ problemId, nodes, onReload })
 {
+    const { user, loading } = useUser();
+
     const tree = useMemo(
         () => buildTree(nodes || []),
         [nodes]
     );
 
-    if (!nodes || nodes.length === 0)
+    const handleAddChild = async (parentId, description) =>
     {
-        return (
-            <div style={{ opacity: 0.7 }}>
-                No nodes yet.
-            </div>
-        );
+        if (loading || !user)
+        {
+            throw new Error("User not loaded");
+        }
+
+        await apiFetch("/8d/rootcauses", {
+            method: "POST",
+            body: JSON.stringify({
+                problem_id: Number(problemId),
+                parent_id: parentId,
+                author_id: user.userId,
+                description,
+            }),
+        });
+
+        onReload();
+    };
+
+    if (loading)
+    {
+        return (<div>Loading user...</div>);
     }
 
     return (
@@ -25,6 +45,7 @@ export default function RootCauseTree({ nodes })
                     key={root.id}
                     node={root}
                     depth={0}
+                    onAddChild={handleAddChild}
                 />
             ))}
         </div>

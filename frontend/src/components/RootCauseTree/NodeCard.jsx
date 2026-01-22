@@ -1,14 +1,25 @@
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { IxPushCard } from "@siemens/ix-react";
 import { iconBulb } from "@siemens/ix-icons/icons";
 
-export default function NodeCard({ node, depth })
+export default function NodeCard({ node, depth, onAddChild })
 {
     const [open, setOpen] = useState(true);
+    const [newChild, setNewChild] = useState("");
+    const textareaRef = useRef(null);
 
     const hasChildren = useMemo(
-        () => (node.children && node.children.length > 0),
+        () => Boolean(node.children && node.children.length > 0),
         [node.children]
+    );
+
+    const subheading = useMemo(
+        () =>
+            [
+                node.createdAt && `Created: ${node.createdAt}`,
+                node.authorName && `Author: ${node.authorName}`,
+            ].filter(Boolean).join(" · "),
+        [node.createdAt, node.authorName]
     );
 
     const toggle = () =>
@@ -20,12 +31,59 @@ export default function NodeCard({ node, depth })
         setOpen((v) => !v);
     };
 
+    const resizeTextarea = () =>
+    {
+        const el = textareaRef.current;
+        if (!el)
+        {
+            return;
+        }
+
+        el.style.height = "auto";
+        el.style.height = `${el.scrollHeight}px`;
+    };
+
+    const submitChild = () =>
+    {
+        const value = newChild.trim();
+
+        if (!value)
+        {
+            return;
+        }
+
+        if (onAddChild)
+        {
+            onAddChild(node.id, value);
+        }
+
+        setNewChild("");
+        setOpen(true);
+
+        requestAnimationFrame(resizeTextarea);
+    };
+
+    const onTextareaKeyDown = (e) =>
+    {
+        if (e.key === "Enter" && !e.shiftKey)
+        {
+            e.preventDefault();
+            submitChild();
+        }
+    };
+
+    const onTextareaChange = (e) =>
+    {
+        setNewChild(e.target.value);
+        resizeTextarea();
+    };
+
     return (
-        <div style={{ marginLeft: depth * 96 }}>
+        <div style={{ marginLeft: depth * 24 }}>
             <IxPushCard
                 icon={iconBulb}
                 heading={node.description}
-                subheading={node.createdAt ? `Created at: ${node.createdAt}` : ""}
+                subheading={subheading}
                 variant="outline"
                 onClick={toggle}
                 style={{
@@ -33,16 +91,59 @@ export default function NodeCard({ node, depth })
                     cursor: hasChildren ? "pointer" : "default",
                 }}
             >
-                <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
-                    <span style={{ fontSize: 12, opacity: 0.75 }}>
-                        #{node.id}
-                    </span>
+                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
 
-                    {hasChildren && (
-                        <span style={{ fontSize: 12, opacity: 0.75 }}>
-                            {open ? "▾ Collapse" : "▸ Expand"} ({node.children.length})
-                        </span>
-                    )}
+                    <div
+                        onClick={(e) => e.stopPropagation()}
+                        style={{
+                            display: "flex",
+                            gap: 10,
+                            alignItems: "flex-start",
+                            width: "100%",
+                        }}
+                    >
+                        <textarea
+                            ref={textareaRef}
+                            value={newChild}
+                            placeholder="Add child cause..."
+                            rows={1}
+                            onChange={onTextareaChange}
+                            onKeyDown={onTextareaKeyDown}
+                            style={{
+                                flex: 1,
+                                width: "100%",
+                                minHeight: 38,
+                                resize: "none",
+                                padding: "8px 12px",
+                                fontSize: 13,
+                                borderRadius: 10,
+                                border: "1px solid rgba(255,255,255,0.25)",
+                                background: "transparent",
+                                color: "inherit",
+                                outline: "none",
+                                lineHeight: "1.4",
+                                overflow: "hidden",
+                            }}
+                        />
+
+                        <button
+                            type="button"
+                            onClick={(e) =>
+                            {
+                                e.stopPropagation();
+                                submitChild();
+                            }}
+                            style={{
+                                padding: "8px 12px",
+                                fontSize: 12,
+                                borderRadius: 10,
+                                cursor: "pointer",
+                                whiteSpace: "nowrap",
+                            }}
+                        >
+                            Add
+                        </button>
+                    </div>
                 </div>
             </IxPushCard>
 
@@ -53,6 +154,7 @@ export default function NodeCard({ node, depth })
                             key={child.id}
                             node={child}
                             depth={depth + 1}
+                            onAddChild={onAddChild}
                         />
                     ))}
                 </div>

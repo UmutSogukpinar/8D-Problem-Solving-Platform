@@ -88,13 +88,16 @@ class RootCausesTreeController extends BaseController
     /**
      * Creates a new root cause tree node.
      *
+     * Handles the creation of a new node in the root cause tree. This endpoint expects a JSON payload containing the necessary details for the node creation.
+     *
      * Request:
      * - Method: POST
-     * 
+     *
      * Expected JSON body:
-     *  - problem_id: int (required)
-     *  - description: string (required, non-empty)
-     *  - parent_id: int|null (optional)
+     *  - problem_id: int (required) - The ID of the problem this node is associated with.
+     *  - description: string (required, non-empty) - A brief description of the root cause.
+     *  - parent_id: int|null (optional) - The ID of the parent node, or null for root-level nodes.
+     *  - author_id: int (required) - The ID of the user creating this node.
      *
      * Responses:
      *  - 201 Created            on success
@@ -113,14 +116,16 @@ class RootCausesTreeController extends BaseController
         Validator::validate($data, [
             'problem_id'  => 'required|int',
             'description' => 'required|string',
-            'parent_id'   => 'nullable|int'
+            'parent_id'   => 'nullable|int',
+            'author_id'   =>  "required|int"
         ]);
 
         // ======== Create the root cause node ========
         $newId = $this->service->create(
             (int) $data['problem_id'],
-            $data['parent_id'],
-            $data['description']
+            (int) $data['parent_id'],
+            $data['description'],
+            (int) $data['author_id']
         );
 
         // ======== Return Response ========

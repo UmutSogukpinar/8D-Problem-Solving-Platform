@@ -10,42 +10,52 @@ export default function ProblemDetail()
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    useEffect(() =>
+    const loadTree = async () =>
     {
         setLoading(true);
         setError(null);
 
-        apiFetch(`/8d/rootcauses/${id}/tree`)
-            .then((res) =>
-            {
-                setData(res);
-                setLoading(false);
-            })
-            .catch((e) =>
-            {
-                setError(e?.message || "Failed to load problem");
-                setLoading(false);
-            });
+        try
+        {
+            const res = await apiFetch(`/8d/rootcauses/${id}/tree`);
+            setData(res);
+        }
+        catch (e)
+        {
+            setError(e?.message || "Failed to load problem");
+        }
+        finally
+        {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() =>
+    {
+        if (!id)
+        {
+            return;
+        }
+        loadTree();
     }, [id]);
 
-    if (loading)
-    {
-        return (<div>Loading...</div>);
-    }
-
-    if (error)
-    {
-        return (<div>{error}</div>);
-    }
+    if (loading) return (<div>Loading...</div>);
+    if (error) return (<div>{error}</div>);
 
     const problem = data?.problem ?? data?.problemDetails ?? data ?? null;
     const nodes = data?.tree ?? data?.nodes ?? [];
+
     return (
         <div>
             <h2>{problem?.title ?? "Untitled"}</h2>
             <p>{problem?.description ?? ""}</p>
 
-            <RootCauseTree nodes={nodes} />
+            <RootCauseTree
+                nodes={nodes}
+                problemId={id}
+                onReload={loadTree}
+            />
         </div>
     );
 }
+

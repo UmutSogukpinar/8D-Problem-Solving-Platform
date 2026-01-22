@@ -14,32 +14,37 @@ final class RootCausesTreeRepository
 	/**
 	 * Persists a new root cause node in the database.
 	 *
-	 * Creates a new record in `root_causes_tree`. If $parentId is null, the node
-	 * is created as a root-level node. Otherwise, it becomes a child of the given
-	 * parent node.
-	 *
 	 * @param int      $problemId Related problem identifier.
 	 * @param int|null $parentId  Parent node identifier (null for root nodes).
 	 * @param string   $desc      Root cause description.
+	 * @param int      $authorId  ID of the user creating this node.
 	 *
-	 * @return int Newly created node ID.
+	 * @return int The newly created node ID.
 	 *
-	 * @throws PDOException If the insert operation fails.
+	 * @throws \PDOException If the insert operation fails.
 	 */
-	public function create(int $problemId, ?int $parentId, string $desc): int
+	public function create(
+		int $problemId, 
+		?int $parentId, 
+		string $desc, 
+		int $authorId
+	): int
 	{
 		$stmt = $this->pdo->prepare(
 			"
-			INSERT INTO root_causes_tree (problem_id, parent_id, description)
-			VALUES (:problem_id, :parent_id, :description)
+			INSERT INTO root_causes_tree (problem_id, parent_id, description, author_id)
+			VALUES (:problem_id, :parent_id, :description, :author_id)
 			"
 		);
 
-		$stmt->execute([
-			'problem_id' => $problemId,
-			'parent_id' => $parentId,
-			'description' => $desc,
-		]);
+		$stmt->execute(
+			[
+				'problem_id' => $problemId,
+				'parent_id' => $parentId,
+				'description' => $desc,
+				'author_id' => $authorId
+			]
+		);
 
 		return ((int)$this->pdo->lastInsertId());
 	}

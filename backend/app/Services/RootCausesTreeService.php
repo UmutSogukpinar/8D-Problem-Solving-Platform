@@ -13,22 +13,32 @@ class RootCausesTreeService
     /**
      * Creates a new root cause tree node.
      *
-     * @param int      $problemId   ID of the related problem
-     * @param int|null $parentId    Parent node ID (null for root-level nodes)
-     * @param string   $description Description of the root cause
+     * This method is responsible for creating a new node in the root cause tree structure. Each node is associated with a specific problem and can optionally have a parent node, forming a hierarchical tree.
      *
-     * @return int The ID of the newly created root cause node
+     * @param int      $problemId   The ID of the problem this node is associated with.
+     * @param int|null $parentId    The ID of the parent node. Use null for root-level nodes.
+     * @param string   $description A brief description of the root cause represented by this node.
+     * @param int      $authorId    The ID of the user who created this node.
+     *
+     * @return int The ID of the newly created root cause node.
      */
     public function create(
         int $problemId,
         ?int $parentId,
-        string $description
+        string $description,
+        int $authorId
     ): int 
     {
+        if ($parentId === 0) 
+        {
+            $parentId = null;
+        }
+
         return ($this->repository->create(
                     $problemId,
                     $parentId,
-                    $description
+                    $description,
+                    $authorId
             )
         );
     }
