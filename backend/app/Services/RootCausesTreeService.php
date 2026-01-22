@@ -149,6 +149,8 @@ class RootCausesTreeService
      *     id: int,
      *     parentId: int|null,
      *     description: string,
+     *     authorId: int
+     *     authorName: string
      *     createdAt: string
      * }>
      */
@@ -163,7 +165,9 @@ class RootCausesTreeService
                             'id'          => $row['id'],
                             'parentId'    => $row['parent_id'],
                             'description' => $row['description'],
-                            'createdAt'   => $row['created_at'],
+                            'authorId'    => $row['author_id'],
+                            'authorName'  => $row['author_name'],
+                            'createdAt'   => $row['created_at']
                         ]
                     );
                 },

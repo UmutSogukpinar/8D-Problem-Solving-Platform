@@ -170,7 +170,7 @@ final class RootCausesTreeRepository
 	public function findTreeByProblemId(int $problemId): ?array
     {
         $stmt = $this->pdo->prepare(
-            "
+"
             SELECT
                 p.id            AS problem_id,
                 p.title         AS problem_title,
@@ -179,19 +179,26 @@ final class RootCausesTreeRepository
 
                 u.id            AS created_by_id,
                 u.name          AS created_by_name,
+                
                 c.id            AS crew_id,
                 c.name          AS crew_name,
 
                 rct.id          AS id, 
                 rct.parent_id   AS parent_id,
                 rct.description AS description,
-                rct.created_at  AS created_at
+                rct.created_at  AS created_at,
+
+                rct.author_id   AS author_id,
+                ua.name         AS author_name
 
             FROM problems p
 
             LEFT JOIN root_causes_tree rct ON rct.problem_id = p.id
             
             INNER JOIN users u    ON u.id = p.created_by
+            
+            LEFT JOIN users ua    ON ua.id = rct.author_id
+
             INNER JOIN crews c    ON c.id = p.crew_id
             
             WHERE p.id = :problem_id
