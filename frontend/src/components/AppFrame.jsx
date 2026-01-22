@@ -15,7 +15,6 @@ import {
 	iconSun,
 	iconMoon,
 	iconHome,
-	iconCertificateError,
 	iconAlarmFilled
 } from "@siemens/ix-icons/icons";
 
