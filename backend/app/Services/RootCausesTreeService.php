@@ -86,25 +86,23 @@ class RootCausesTreeService
      */
     public function getTreeByProblemId(int $problemId): ?array
     {
-        $rawList = $this->repository->findTreeByProblemId($problemId);
+            $rawList = $this->repository->findTreeByProblemId($problemId);
 
-        if ($rawList == null)
-        {
-            return (null);
-        }
+            if (empty($rawList)) 
+            {
+                return (null);
+            }
 
-        $firstRow = current($rawList);
-        $hasNodes = !empty($firstRow['id']);
+            $firstRow = current($rawList);
+            $problem = $this->extractProblemDetails($firstRow);
 
-        return (
-            [
-                'problem' => $this->extractProblemDetails($firstRow),
+            $hasNodes = !empty($firstRow['id']);
+            
+            $problem['nodes'] = $hasNodes 
+            ? $this->sortNodesHierarchically($this->mapRawNodes($rawList)) 
+            : [];
 
-                'tree' => $hasNodes 
-                    ? $this->buildTree($this->mapRawNodes($rawList)) 
-                    : []
-            ]
-        );
+            return ($problem);
     }
 
     /**
@@ -175,41 +173,80 @@ class RootCausesTreeService
     }
 
     /**
-     * Builds a hierarchical tree structure from a flat list of elements.
+     * Orders a flat list of nodes so that each parent node
+     * is immediately followed by its descendants.
      *
-     * @param array $elements Flat array of root cause nodes.
+     * @param array<int, array{
+     *     id: int,
+     *     parentId: int|null,
+     *     description: string,
+     *     createdAt: string
+     * }> $elements Flat list of mapped nodes
      *
-     * @return array Hierarchical tree structure.
+     * @return array<int, array{
+     *     id: int,
+     *     parentId: int|null,
+     *     description: string,
+     *     createdAt: string
+     * }>
      */
-    private function buildTree(array $elements): array
+    private function sortNodesHierarchically(array $elements): array
     {
-        $tree = [];
-        $nodesById = [];
+        $groupedByParent = [];
 
-        foreach ($elements as $element)
+        foreach ($elements as $element) 
         {
-            $element['children'] = [];
-            $nodesById[$element['id']] = $element;
+            $key = $element['parentId'] ?? 'root';
+            $groupedByParent[$key][] = $element;
         }
 
-        foreach ($nodesById as $id => &$node) 
-        {
-            $parentId = $node['parentId'];
+        return ($this->flattenTree($groupedByParent, null));
+    }
 
-            if ($parentId === null) 
+    /**
+     * Flattens a parent-grouped node structure into a single
+     * depth-first ordered list
+     *
+     * @param array<string|int, array<int, array{
+     *     id: int,
+     *     parentId: int|null,
+     *     description: string,
+     *     createdAt: string
+     * }>> $groupedNodes Nodes grouped by parentId
+     *
+     * @param int|null $parentId Current parent node ID
+     *
+     * @return array<int, array{
+     *     id: int,
+     *     parentId: int|null,
+     *     description: string,
+     *     createdAt: string
+     * }>
+     */
+    private function flattenTree(array $groupedNodes, ?int $parentId): array
+    {
+        $key = $parentId ?? 'root';
+
+        if (!isset($groupedNodes[$key])) 
+        {
+            return ([]);
+        }
+
+        $result = [];
+
+        foreach ($groupedNodes[$key] as $node) 
+        {
+            $result[] = $node;
+
+            $children = $this->flattenTree($groupedNodes, $node['id']);
+
+            if (!empty($children)) 
             {
-                $tree[] = &$node;
-            }
-            else
-            {
-                if (isset($nodesById[$parentId]))
-                {
-                    $nodesById[$parentId]['children'][] = &$node;
-                }
+                $result = array_merge($result, $children);
             }
         }
 
-        return ($tree);
+        return ($result);
     }
 
 }
