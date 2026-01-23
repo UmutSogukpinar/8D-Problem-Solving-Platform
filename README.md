@@ -214,6 +214,41 @@ make rebuild
 
 Cleans the environment and rebuilds the entire system.
 
+### Run Tests
+
+```bash
+make test
+```
+
+Runs available tests inside the application container (if any).
+
+---
+
+## Constraints & Dependencies
+
+Before running the project locally, ensure the following requirements are met:
+
+### System Requirements
+
+* **Docker** and **Docker Compose** must be installed
+* **Make** must be available on the system
+* **Port 80 must be free** (used by the reverse proxy / frontend container)
+
+  * If port 80 is already in use, the containers will fail to start
+  * You may stop the conflicting service or adjust port mappings in `docker-compose.yml`
+
+### Runtime Dependencies
+
+* The application relies on Docker networking for internal service communication
+* Backend and frontend containers must be running together
+* Environment variables are loaded via Docker configuration
+
+### Known Limitations
+
+* This is an **MVP / case study**, not a production-hardened system
+* No authentication or authorization layer is implemented
+* Error handling and validation are intentionally minimal
+
 ---
 
 ## Notes
@@ -221,4 +256,3 @@ Cleans the environment and rebuilds the entire system.
 * This project is an **MVP / case study**, not a production-ready system
 * Focus is on data modeling, architecture, and clarity
 * Siemens iX Design System is used consistently across the UI
-
