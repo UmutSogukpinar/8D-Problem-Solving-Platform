@@ -6,6 +6,7 @@ require_once dirname(__DIR__) . '/config/constants.php';
 require_once ROOT_DIR . '/config/database.php';
 require_once ROOT_DIR . '/utils/logger.php';
 
+// Clear Log File
 initLogger();
 
 $pdo = getPdo();

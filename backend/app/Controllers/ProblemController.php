@@ -13,10 +13,7 @@ final class ProblemController extends BaseController
     public function __construct(
         private Request $request,
         private ProblemService $service
-    ) 
-    {
-        logMessage(DEBUG, "Problem Controller initalized!");
-    }
+    ) {}
 
     /**
      * Health check endpoint for the ProblemController.

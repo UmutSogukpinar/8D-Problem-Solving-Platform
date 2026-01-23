@@ -162,6 +162,7 @@ class RootCausesTreeService
      *     authorId: int
      *     authorName: string
      *     createdAt: string
+     *     isRootCause: bool
      * }>
      */
     private function mapRawNodes(array $rawList): array
@@ -177,7 +178,8 @@ class RootCausesTreeService
                             'description' => $row['description'],
                             'authorId'    => $row['author_id'],
                             'authorName'  => $row['author_name'],
-                            'createdAt'   => $row['created_at']
+                            'createdAt'   => $row['created_at'],
+                            "isRootCause" => $row['is_root_cause']
                         ]
                     );
                 },
