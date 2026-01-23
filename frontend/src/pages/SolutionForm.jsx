@@ -8,7 +8,6 @@ import {
     IxLayoutGrid,
     IxRow,
     IxCol,
-    IxTextarea,
     IxTypography,
     IxSpinner,
     IxIcon

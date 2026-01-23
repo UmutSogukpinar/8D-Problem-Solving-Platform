@@ -2,7 +2,15 @@ import { useMemo, useRef, useState } from "react";
 import { IxPushCard } from "@siemens/ix-react";
 import { iconBulb } from "@siemens/ix-icons/icons";
 
-export default function NodeCard({ node, depth, onAddChild, onToggleRootCause, onNavigate }) {
+export default function NodeCard({
+    node,
+    depth,
+    problemId,
+    onAddChild,
+    onToggleRootCause,
+    onNavigate,
+    onNavigateSolutions,
+}) {
     const [open, setOpen] = useState(true);
     const [newChild, setNewChild] = useState("");
     const [isFocused, setIsFocused] = useState(false);
@@ -69,10 +77,13 @@ export default function NodeCard({ node, depth, onAddChild, onToggleRootCause, o
         onNavigate?.(node.id);
     };
 
+    const handleSolutionsClick = (e) => {
+        e.stopPropagation();
+        onNavigateSolutions?.(problemId);
+    };
+
     const rootColor = "#dc3545";
-    
-    const isRoot = Boolean(node.isRootCause); 
-    
+    const isRoot = Boolean(node.isRootCause);
     const isValidInput = newChild.trim().length > 0;
 
     return (
@@ -90,30 +101,62 @@ export default function NodeCard({ node, depth, onAddChild, onToggleRootCause, o
                 }}
             >
                 <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-                    <div style={{ display: "flex", justifyContent: "flex-end", gap: 8, paddingTop: 16 }}>
+                    <div
+                        style={{
+                            display: "flex",
+                            justifyContent: "flex-end",
+                            gap: 8,
+                            paddingTop: 16,
+                        }}
+                    >
                         {isRoot && (
-                            <button
-                                type="button"
-                                onClick={handleNavigateClick}
-                                style={{
-                                    display: "flex",
-                                    alignItems: "center",
-                                    gap: 6,
-                                    padding: "6px 14px",
-                                    fontSize: 12,
-                                    fontWeight: 600,
-                                    borderRadius: 20,
-                                    cursor: "pointer",
-                                    transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
-                                    border: "1px solid rgba(255,255,255,0.3)",
-                                    background: "rgba(255,255,255,0.05)",
-                                    color: "inherit",
-                                    outline: "none",
-                                }}
-                            >
-                                <span>↗</span>
-                                <span>Details</span>
-                            </button>
+                            <>
+                                <button
+                                    type="button"
+                                    onClick={handleNavigateClick}
+                                    style={{
+                                        display: "flex",
+                                        alignItems: "center",
+                                        gap: 6,
+                                        padding: "6px 14px",
+                                        fontSize: 12,
+                                        fontWeight: 600,
+                                        borderRadius: 20,
+                                        cursor: "pointer",
+                                        transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
+                                        border: "1px solid rgba(255,255,255,0.3)",
+                                        background: "rgba(255,255,255,0.05)",
+                                        color: "inherit",
+                                        outline: "none",
+                                    }}
+                                >
+                                    <span>↗</span>
+                                    <span>Enter Solution</span>
+                                </button>
+
+                                <button
+                                    type="button"
+                                    onClick={handleSolutionsClick}
+                                    style={{
+                                        display: "flex",
+                                        alignItems: "center",
+                                        gap: 6,
+                                        padding: "6px 14px",
+                                        fontSize: 12,
+                                        fontWeight: 600,
+                                        borderRadius: 20,
+                                        cursor: "pointer",
+                                        transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
+                                        border: "1px solid rgba(255,255,255,0.3)",
+                                        background: "rgba(255,255,255,0.05)",
+                                        color: "inherit",
+                                        outline: "none",
+                                    }}
+                                >
+                                    <span>🛠</span>
+                                    <span>Solutions</span>
+                                </button>
+                            </>
                         )}
 
                         <button
@@ -129,11 +172,13 @@ export default function NodeCard({ node, depth, onAddChild, onToggleRootCause, o
                                 borderRadius: 20,
                                 cursor: "pointer",
                                 transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
-                                border: `1px solid ${isRoot ? rootColor : "rgba(255,255,255,0.3)"}`,
+                                border: `1px solid ${
+                                    isRoot ? rootColor : "rgba(255,255,255,0.3)"
+                                }`,
                                 background: isRoot ? rootColor : "rgba(255,255,255,0.05)",
                                 color: isRoot ? "#fff" : "inherit",
                                 outline: "none",
-                                paddingTop: "6px"
+                                paddingTop: "6px",
                             }}
                         >
                             <span>{isRoot ? "★" : "☆"}</span>
@@ -170,8 +215,14 @@ export default function NodeCard({ node, depth, onAddChild, onToggleRootCause, o
                                     padding: "12px 16px",
                                     fontSize: 14,
                                     borderRadius: 12,
-                                    border: `1px solid ${isFocused ? "rgba(255,255,255,0.5)" : "rgba(255,255,255,0.15)"}`,
-                                    background: isFocused ? "rgba(255,255,255,0.1)" : "rgba(255,255,255,0.05)",
+                                    border: `1px solid ${
+                                        isFocused
+                                            ? "rgba(255,255,255,0.5)"
+                                            : "rgba(255,255,255,0.15)"
+                                    }`,
+                                    background: isFocused
+                                        ? "rgba(255,255,255,0.1)"
+                                        : "rgba(255,255,255,0.05)",
                                     color: "inherit",
                                     outline: "none",
                                     lineHeight: "1.5",
@@ -179,7 +230,7 @@ export default function NodeCard({ node, depth, onAddChild, onToggleRootCause, o
                                     boxSizing: "border-box",
                                     transition: "all 0.2s ease",
                                     fontFamily: "inherit",
-                                    marginLeft: 6
+                                    marginLeft: 6,
                                 }}
                             />
                         </div>
@@ -206,7 +257,9 @@ export default function NodeCard({ node, depth, onAddChild, onToggleRootCause, o
                                 alignItems: "center",
                                 justifyContent: "center",
                                 transition: "all 0.2s ease",
-                                boxShadow: isValidInput ? "0 4px 12px rgba(0,123,255,0.3)" : "none",
+                                boxShadow: isValidInput
+                                    ? "0 4px 12px rgba(0,123,255,0.3)"
+                                    : "none",
                                 transform: isValidInput && isFocused ? "translateY(-1px)" : "none",
                             }}
                         >
@@ -223,9 +276,11 @@ export default function NodeCard({ node, depth, onAddChild, onToggleRootCause, o
                             key={child.id}
                             node={child}
                             depth={depth + 1}
+                            problemId={problemId}
                             onAddChild={onAddChild}
                             onToggleRootCause={onToggleRootCause}
                             onNavigate={onNavigate}
+                            onNavigateSolutions={onNavigateSolutions}
                         />
                     ))}
                 </div>

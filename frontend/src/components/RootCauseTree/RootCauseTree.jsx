@@ -5,7 +5,7 @@ import { buildTree } from "../../utils/buildTree";
 import { apiFetch } from "../../api/client";
 import { useUser } from "../../context/UserContext";
 
-export default function RootCauseTree({ problemId, nodes, onReload }) 
+export default function RootCauseTree({ problemId, nodes, onReload })
 {
     const { user, loading } = useUser();
     const navigate = useNavigate();
@@ -48,6 +48,11 @@ export default function RootCauseTree({ problemId, nodes, onReload })
         navigate(`/root-causes/${nodeId}`);
     };
 
+    // ✅ NEW: go to solutions page for the current problem
+    const handleNavigateSolutions = (pid) => {
+        navigate(`/problems/${pid}/solutions`);
+    };
+
     if (loading) {
         return (<div>Loading user...</div>);
     }
@@ -59,9 +64,11 @@ export default function RootCauseTree({ problemId, nodes, onReload })
                     key={root.id}
                     node={root}
                     depth={0}
+                    problemId={problemId}
                     onAddChild={handleAddChild}
                     onToggleRootCause={handleToggleRootCause}
                     onNavigate={handleNavigate}
+                    onNavigateSolutions={handleNavigateSolutions}
                 />
             ))}
         </div>
