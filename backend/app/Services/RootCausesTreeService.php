@@ -11,6 +11,24 @@ class RootCausesTreeService
     public function __construct(private RootCausesTreeRepository $repository) {}
 
     /**
+     * Toggles the `is_root_cause` flag for a specific root cause node.
+     *
+     * @param int $id The unique identifier of the root cause node to update.
+     *
+     * @return mixed The updated node data as an associative array, 
+     *                or null if no rows were updated.
+     */
+    public function updateIsRootCause(int $id): mixed
+    {
+        $result = $this->repository->updateIsRootCause($id);
+
+        if ($result == null)
+            return (null);
+
+        return ($this->getById($id));
+    }
+
+    /**
      * Creates a new root cause tree node.
      *
      * This method is responsible for creating a new node in the root cause tree structure. Each node is associated with a specific problem and can optionally have a parent node, forming a hierarchical tree.
@@ -56,12 +74,15 @@ class RootCausesTreeService
      *         createdAt: string,
      *         author: array{id:int, name:string},
      *         crew: array{id:int, name:string}
+     * 
      *     },
      *     node: array{
      *         id: int,
      *         parentId: int|null,
      *         description: string,
      *         createdAt: string
+     *         isRootCause: bool
+     * 
      *     }
      * }|null
      */

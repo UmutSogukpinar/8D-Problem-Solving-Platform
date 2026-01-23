@@ -3,6 +3,7 @@ import AppFrame from "./components/AppFrame";
 import ProblemDashboard from "./pages/ProblemDashboard"
 import ProblemInsert from "./pages/ProblemInsert";
 import ProblemDetail from "./pages/ProblemDetail";
+import SolutionForm from "./pages/SolutionForm";
 
 function Home() {
   return <div>Home</div>;
@@ -20,6 +21,7 @@ export default function App() {
         <Route path="/problem/dashboard" element={<ProblemDashboard />} />
         <Route path="/problem/dashboard/insert" element={<ProblemInsert />} />
         <Route path="/problems/:id" element={<ProblemDetail />} />
+        <Route path="//root-causes/:id" element={<SolutionForm />} />
         <Route path="/404" element={<NotFound />} />
         <Route path="*" element={<Navigate to="/404" replace />} />
       </Route>

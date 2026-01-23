@@ -49,3 +49,8 @@ $router->post(
     '/8d/rootcauses',
     [RootCausesTreeController::class, 'store']
 );
+
+$router->patch(
+    '/8d/rootcauses/{id}/is_root_cause',
+    [RootCausesTreeController::class, 'updateIsRootCause']
+);

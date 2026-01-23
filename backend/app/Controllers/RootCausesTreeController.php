@@ -16,7 +16,7 @@ class RootCausesTreeController extends BaseController
         private RootCausesTreeService $service
     ) {}
 
-	/**
+    /**
      * Health check endpoint for the RootCausesTreeController.
      *
      * Request:
@@ -74,15 +74,46 @@ class RootCausesTreeController extends BaseController
     {
         $result = $this->service->getTreeByProblemId($problemId);
 
-        if ($result == null)
-        {
+        if ($result == null) {
             throw new NotFoundException($problemId, "Problem");
         }
 
         return ($this->jsonResponse(
-            $result, 
+            $result,
             HTTP_OK
         ));
+    }
+
+    /**
+     * Toggles the `is_root_cause` flag for a specific root cause node.
+     *
+     * Request:
+     * - Method: PATCH
+     *
+     * Responses:
+     * - 200 OK                  on success
+     * - 404 Not Found           if the node does not exist
+     *
+     * @param int $id The unique identifier of the root cause node to update.
+     *
+     * @return mixed The updated node data as an associative array.
+     *
+     * @throws NotFoundException If the node does not exist.
+     */
+    public function updateIsRootCause(int $id): mixed
+    {
+        $result = $this->service->updateIsRootCause($id);
+
+        if ($result == null) {
+            throw new NotFoundException($id, "Problem Cause");
+        }
+
+        return (
+            $this->jsonResponse(
+                $result,
+                HTTP_OK
+            )
+        );
     }
 
     /**
@@ -137,5 +168,4 @@ class RootCausesTreeController extends BaseController
             HTTP_CREATED
         ));
     }
-
 }

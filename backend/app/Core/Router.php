@@ -48,6 +48,19 @@ final class Router
     }
 
     /**
+     * Registers a PATCH route.
+     *
+     * @param string         $path    Request path (e.g. "/problems")
+     * @param callable|array $handler Route handler
+     *
+     * @return void
+     */
+    public function patch(string $path, callable|array $handler): void
+    {
+        $this->routes['PATCH'][$this->normalize($path)] = $handler;
+    }
+
+    /**
      * Dispatches the current HTTP request to a registered route.
      *
      * Reads the HTTP method and request URI from the server environment,

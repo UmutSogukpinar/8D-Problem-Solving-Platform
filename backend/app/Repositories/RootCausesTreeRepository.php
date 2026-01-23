@@ -12,6 +12,41 @@ final class RootCausesTreeRepository
 	public function __construct(private PDO $pdo) {}
 
 	/**
+	 * Toggles the `is_root_cause` flag for a specific root cause node.
+	 *
+	 * Updates the `is_root_cause` field to its opposite value (true to false, or false to true)
+	 * for the node with the given ID. If the update is successful, the updated node data
+	 * is retrieved and returned.
+	 *
+	 * @param int $id The unique identifier of the root cause node to update.
+	 *
+	 * @return array|null The updated node data as an associative array, or null if no rows were updated.
+	 *
+	 * @throws \PDOException If the query execution fails.
+	 */
+	public function updateIsRootCause(int $id): ?array
+	{
+		$sql = "
+				UPDATE root_causes_tree 
+				SET is_root_cause = NOT is_root_cause 
+				WHERE id = :id
+				";
+				
+		$stmt = $this->pdo->prepare($sql);
+		$stmt->execute(['id' => $id]);
+
+		if ($stmt->rowCount() > 0)
+			{
+			$stmt = $this->pdo->prepare("SELECT * FROM root_causes_tree WHERE id = :id");
+			$stmt->execute(['id' => $id]);
+			
+			return ($stmt->fetch(PDO::FETCH_ASSOC));
+		}
+
+		return (null);
+	}
+
+	/**
 	 * Inserts a new root cause tree node.
 	 *
 	 * Persists a node linked to a specific problem. If $parentId is null, the node is a root-level node.
@@ -245,11 +280,10 @@ final class RootCausesTreeRepository
 		return (
 			"
 			SELECT
-				rct.id            AS node_id,
-				rct.problem_id    AS node_problem_id,
-				rct.parent_id     AS node_parent_id,
-				rct.description   AS node_description,
-				rct.created_at    AS node_created_at,
+				rct.id            AS id,
+				rct.parent_id     AS parent_id,
+				rct.description   AS description,
+				rct.created_at    AS created_at,
 
 				rct.is_root_cause AS is_root_cause,
 

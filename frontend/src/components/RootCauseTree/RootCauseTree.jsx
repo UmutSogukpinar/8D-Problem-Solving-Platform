@@ -1,22 +1,22 @@
 import { useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import NodeCard from "./NodeCard";
 import { buildTree } from "../../utils/buildTree";
 import { apiFetch } from "../../api/client";
 import { useUser } from "../../context/UserContext";
 
-export default function RootCauseTree({ problemId, nodes, onReload })
+export default function RootCauseTree({ problemId, nodes, onReload }) 
 {
     const { user, loading } = useUser();
+    const navigate = useNavigate();
 
     const tree = useMemo(
         () => buildTree(nodes || []),
         [nodes]
     );
 
-    const handleAddChild = async (parentId, description) =>
-    {
-        if (loading || !user)
-        {
+    const handleAddChild = async (parentId, description) => {
+        if (loading || !user) {
             throw new Error("User not loaded");
         }
 
@@ -33,8 +33,22 @@ export default function RootCauseTree({ problemId, nodes, onReload })
         onReload();
     };
 
-    if (loading)
-    {
+    const handleToggleRootCause = async (nodeId, newStatus) => {
+        await apiFetch(`/8d/rootcauses/${nodeId}/is_root_cause`, {
+            method: "PATCH",
+            body: JSON.stringify({
+                is_root_cause: newStatus,
+            }),
+        });
+
+        onReload();
+    };
+
+    const handleNavigate = (nodeId) => {
+        navigate(`/root-causes/${nodeId}`);
+    };
+
+    if (loading) {
         return (<div>Loading user...</div>);
     }
 
@@ -46,6 +60,8 @@ export default function RootCauseTree({ problemId, nodes, onReload })
                     node={root}
                     depth={0}
                     onAddChild={handleAddChild}
+                    onToggleRootCause={handleToggleRootCause}
+                    onNavigate={handleNavigate}
                 />
             ))}
         </div>
