@@ -267,7 +267,6 @@ final class RootCausesTreeRepository
 		return ($result);
 	}
 
-
 	/**
 	 * Builds the SELECT clause (with aliases) used by node-context queries.
 	 *

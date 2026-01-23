@@ -104,7 +104,7 @@ const SolutionForm = () => {
                 }),
             })
 
-            navigate(`/8d/problems/${problemId}/solutions`)
+            navigate(`/problems/${problemId}/solutions`)
         }
         catch (error) {
             console.error(error)

@@ -37,7 +37,16 @@ final class SolutionService
 	 *
 	 * @param int $id Solution identifier.
 	 *
-	 * @return array|null The solution data, or null if not found.
+	 * @return array{
+	 *     id: int,
+	 *     problemId: int,
+	 *     rootCauseId: int,
+	 *     rootCauseDescription: string|null,
+	 *     isRootCause: bool|null,
+	 *     description: string,
+	 *     createdAt: string,
+	 *     author: array{id: int, name: string}|null
+	 * }|null
 	 */
 	public function getById(int $id): ?array
 	{
@@ -60,6 +69,8 @@ final class SolutionService
 	 *     id: int,
 	 *     problemId: int,
 	 *     rootCauseId: int,
+	 *     rootCauseDescription: string|null,
+	 *     isRootCause: bool|null,
 	 *     description: string,
 	 *     createdAt: string,
 	 *     author: array{id: int, name: string}|null
@@ -75,12 +86,18 @@ final class SolutionService
 	/**
 	 * Maps a raw repository row into API-ready structure.
 	 *
+	 * Expected extra fields (optional, depending on SELECT):
+	 *  - root_cause_description
+	 *  - is_root_cause
+	 *
 	 * @param array $r Raw row.
 	 *
 	 * @return array{
 	 *     id: int,
 	 *     problemId: int,
 	 *     rootCauseId: int,
+	 *     rootCauseDescription: string|null,
+	 *     isRootCause: bool|null,
 	 *     description: string,
 	 *     createdAt: string,
 	 *     author: array{id: int, name: string}|null
@@ -98,16 +115,33 @@ final class SolutionService
 			];
 		}
 
+		$rootCauseDescription = null;
+
+		if (array_key_exists('root_cause_description', $r) && $r['root_cause_description'] !== null)
+		{
+			$rootCauseDescription = (string)$r['root_cause_description'];
+		}
+
+		$isRootCause = null;
+
+		if (array_key_exists('is_root_cause', $r) && $r['is_root_cause'] !== null)
+		{
+			$isRootCause = ((int)$r['is_root_cause'] === 1);
+		}
+
 		return (
 			[
 				'id' => (int)$r['id'],
 				'problemId' => (int)$r['problem_id'],
 				'rootCauseId' => (int)$r['root_cause_id'],
+
+				'rootCauseDescription' => $rootCauseDescription,
+				'isRootCause' => $isRootCause,
+
 				'description' => (string)$r['description'],
 				'createdAt' => (string)$r['created_at'],
 				'author' => $author,
 			]
 		);
 	}
-
 }

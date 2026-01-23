@@ -95,10 +95,14 @@ final class SolutionRepository
 				s.description,
 				s.created_at,
 
+				rc.description AS root_cause_description,
+				rc.is_root_cause,
+
 				u.id   AS author_id,
 				u.name AS author_name
 
 			FROM solutions s
+			INNER JOIN root_causes_tree rc ON rc.id = s.root_cause_id
 			LEFT JOIN users u ON u.id = s.author_id
 			WHERE s.problem_id = :pid
 			ORDER BY s.created_at DESC
@@ -109,5 +113,6 @@ final class SolutionRepository
 
 		return ($stmt->fetchAll(PDO::FETCH_ASSOC));
 	}
+
 
 }

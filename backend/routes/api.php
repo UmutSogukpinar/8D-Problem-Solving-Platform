@@ -40,6 +40,11 @@ $router->get(
     [\App\Controllers\SolutionController::class, 'getSolution']
 );
 
+$router->get(
+	'/8d/problems/{id}/solutions',
+	[\App\Controllers\SolutionController::class, 'getSolutionsByProblemId']
+);
+
 $router->post(
     '/8d/solutions', 
     [\App\Controllers\SolutionController::class, 'store']

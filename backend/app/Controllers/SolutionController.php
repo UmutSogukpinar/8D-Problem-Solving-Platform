@@ -6,6 +6,7 @@ namespace App\Controllers;
 
 use App\Core\Request;
 use App\Core\Validator;
+use App\Exceptions\NotFoundException;
 use App\Services\SolutionService;
 
 final class SolutionController extends BaseController
@@ -50,7 +51,41 @@ final class SolutionController extends BaseController
 	 */
 	public function getSolution(int $id): mixed
 	{
-		return ($this->get($id, [$this->service, 'getById']));
+		$status = $this->get($id, [$this->service, 'getById']);
+
+		if ($status == null)
+		{
+			throw new NotFoundException($id, "Solution");
+		}
+
+		return ($this->jsonResponse(
+			$status,
+			HTTP_OK
+		));
+	}
+
+	/**
+	 * Returns all solution resources for a given problem.
+	 *
+	 * Request:
+	 *  - Method: GET
+	 *
+	 * Route param:
+	 *  - id: int (problem id)
+	 *
+	 * Responses:
+	 *  - 200 OK on success (returns [] if no solutions)
+	 *
+	 * @param int $id The unique identifier of the problem resource.
+	 *
+	 * @return mixed Prepared response payload.
+	 */
+	public function getSolutionsByProblemId(int $id): mixed
+	{
+		return ($this->jsonResponse(
+			$this->service->getAllByProblemId($id),
+			HTTP_OK
+		));
 	}
 
 	/**
