@@ -100,6 +100,7 @@ const SolutionForm = () => {
                     root_cause_id: Number(id),
                     author_id: Number(user.userId),
                     description: trimmed,
+                    problem_id: Number(problem.id)
                 }),
             })
 

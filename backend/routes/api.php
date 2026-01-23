@@ -28,6 +28,24 @@ $router->get('/8d/problems/{id}', [ProblemController::class, 'getProblem']);
 $router->post('/8d/problems', [ProblemController::class, 'store']);
 
 
+// ========================= Solutions Endpoint =========================
+
+$router->get(
+    '/8d/solutions/health', 
+    [\App\Controllers\SolutionController::class, 'health']
+);
+
+$router->get(
+    '/8d/solutions/{id}',
+    [\App\Controllers\SolutionController::class, 'getSolution']
+);
+
+$router->post(
+    '/8d/solutions', 
+    [\App\Controllers\SolutionController::class, 'store']
+);
+
+
 // ======================= RootCausesTree Endpoint =======================
 
 $router->get(
