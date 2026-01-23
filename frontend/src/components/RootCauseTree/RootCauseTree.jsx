@@ -48,7 +48,6 @@ export default function RootCauseTree({ problemId, nodes, onReload })
         navigate(`/root-causes/${nodeId}`);
     };
 
-    // ✅ NEW: go to solutions page for the current problem
     const handleNavigateSolutions = (pid) => {
         navigate(`/problems/${pid}/solutions`);
     };

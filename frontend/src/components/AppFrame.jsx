@@ -72,7 +72,7 @@ export default function AppFrame() {
 			</IxMenu>
 
 			<IxContent>
-				<IxContentHeader slot="header" headerTitle="My Content Page" />
+				<IxContentHeader slot="header" headerTitle="8D Problem Solving Platform" />
 				<Outlet />
 			</IxContent>
 		</IxApplication>

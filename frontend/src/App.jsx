@@ -5,11 +5,8 @@ import ProblemInsert from "./pages/ProblemInsert";
 import ProblemDetail from "./pages/ProblemDetail";
 import SolutionForm from "./pages/SolutionForm";
 import SolutionsListPage from "./pages/SolutionListPage"
+import MainMenu from "./pages/MainMenu"
 
-function Home()
-{
-	return (<div>Home</div>);
-}
 
 function NotFound()
 {
@@ -21,7 +18,7 @@ export default function App()
 	return (
 		<Routes>
 			<Route element={<AppFrame />}>
-				<Route path="/" element={<Home />} />
+				<Route path="/" element={<MainMenu />} />
 				<Route path="/problem/dashboard" element={<ProblemDashboard />} />
 				<Route path="/problem/dashboard/insert" element={<ProblemInsert />} />
 				<Route path="/problems/:id" element={<ProblemDetail />} />
